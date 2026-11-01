@@ -1,0 +1,13 @@
+time timestamp
+float64 steady_s
+string experiment_id
+string candidate_id
+string event_type
+string axis
+float64 amplitude_deg_s
+string requested_parameters
+string readback_parameters
+uint32 trial_id
+int32 repetition
+int32 phase
+string detail

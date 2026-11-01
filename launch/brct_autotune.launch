@@ -1,0 +1,11 @@
+<launch>
+  <arg name="config" default="$(find holydrone_autotune)/config/brct_autotune.yaml"/>
+  <!-- Required unique directory; the FSM creates it and archives the YAML. -->
+  <arg name="output"/>
+  <arg name="mavros_namespace" default="/mavros"/>
+  <node pkg="holydrone_autotune" type="brct_autotune_fsm" name="brct_autotune_fsm" output="screen" required="true">
+    <param name="config" value="$(arg config)"/>
+    <param name="output" value="$(arg output)"/>
+    <param name="mavros_namespace" value="$(arg mavros_namespace)"/>
+  </node>
+</launch>

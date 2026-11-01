@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+
+build/
+devel/
+install/
+log/
+*.bag
+*.bag.active
+*.log
