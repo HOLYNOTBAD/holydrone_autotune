@@ -1,0 +1,17 @@
+{
+  "kind": "autotune",
+  "complete": true,
+  "duration_s": 53.964,
+  "origin": [
+    -0.08862253278493881,
+    -0.24511195719242096,
+    3.50128173828125
+  ],
+  "altitude_min_m": 3.481719970703125,
+  "altitude_max_m": 3.539947509765625,
+  "max_drop_m": 0.019561767578125,
+  "max_tilt_deg": 40.41138004479551,
+  "max_xy_distance_m": 1.4531629689878722,
+  "pulses": 48,
+  "scope": "single local SITL run; default full sequence; empty world; not hardware validation"
+}

@@ -1,0 +1,7 @@
+# 从 PX4 实际读取的 roll 角速度环参数；本文件不会自动应用到飞控。
+baseline:  # 人工恢复使用的 P/I/D/FF/K；不会自动恢复
+  MC_ROLLRATE_P: 0.05400000140070915  # roll 角速度环比例项
+  MC_ROLLRATE_I: 0.07400000095367432  # roll 角速度环积分项
+  MC_ROLLRATE_D: 0.00139999995008111  # roll 角速度环微分项
+  MC_ROLLRATE_FF: 0.0  # roll 角速度环前馈项
+  MC_ROLLRATE_K: 1.0  # roll 角速度环总增益

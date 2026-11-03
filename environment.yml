@@ -1,0 +1,12 @@
+name: holydrone_autotune
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.10
+  - numpy=1.26
+  - matplotlib-base=3.9
+  - pyyaml
+  - pip
+  - pip:
+      - pyulog==1.3.0

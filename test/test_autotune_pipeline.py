@@ -1,4 +1,4 @@
-"""Synthetic real .ulg and time synchronization files exercise clock joining and complete report generation."""
+"""生成合成 ULog、事件与时间同步文件，验证离线报告流水线；无需飞控或仿真。"""
 from pathlib import Path
 import struct
 import subprocess
@@ -11,21 +11,34 @@ import yaml
 
 
 class PipelineTest(unittest.TestCase):
+    """在临时目录生成 ULog 与会话文件，并调用真实离线分析入口。"""
     def test_ulog_report(self):
+        self.run_report(False)
+
+    def test_recovery_after_each_pulse(self):
+        self.run_report(True)
+
+    def run_report(self, each_pulse):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             times = np.arange(0, 6, .005)
             offset = 1700000000.
             segments = [(.75, 0), (.25, 1), (.25, -1), (.75, 0), (.25, -1), (.25, 1), (1., 0)]
+            if each_pulse:
+                segments = [(.3, 0), (.25, 1), (.3, 0), (.25, -1), (.3, 0), (.25, -1), (.3, 0), (.25, 1), (.3, 0)]
             start = 1.
             events = [dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1', event_type='TRIAL_START')]
             sp = np.zeros(len(times))
             for phase, (duration, sign) in enumerate(segments):
                 events.append(dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1',
-                                   event_type='PULSE_ZERO' if sign == 0 else 'PULSE_POSITIVE' if sign > 0 else 'PULSE_NEGATIVE',
+                                   event_type=('RECOVERY_START' if each_pulse else 'PULSE_ZERO') if sign == 0 else 'PULSE_POSITIVE' if sign > 0 else 'PULSE_NEGATIVE',
                                    amplitude_deg_s=60, repetition=0, phase=phase))
                 sp[(times >= start) & (times < start+duration)] = sign*np.deg2rad(60)
                 start += duration
+                if each_pulse:
+                    events.append(dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1',
+                                       event_type='PULSE_FINISHED' if sign else 'RECOVERY_FINISHED',
+                                       amplitude_deg_s=60, repetition=0, phase=phase))
             events.append(dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1', event_type='TRIAL_FINISHED'))
             (root/'events.yaml').write_text(yaml.safe_dump_all(events))
             with (root/'timesync.csv').open('w') as stream:
@@ -51,7 +64,10 @@ class PipelineTest(unittest.TestCase):
                     record('A', struct.pack('<BH', 0, mid)+name.encode())
                     for t, value in zip(times, data):
                         record('D', struct.pack('<HQfff', mid, int(round(t*1e6)), value, 0, 0))
-            script = Path(__file__).resolve().parents[1]/'scripts/brct_autotune_analyze.py'
+                    if name == 'vehicle_status':
+                        # 同一PX4时刻可以发布两次状态更新，不应把它当成时钟倒退。
+                        record('D', struct.pack('<HQfff', mid, int(round(times[-1]*1e6)), 0, 0, 0))
+            script = Path(__file__).resolve().parents[1]/'scripts/autotune_analyze.py'
             command = [sys.executable, str(script), '--session', str(root), '--ulog', str(root/'flight.ulg'),
                        '--output', str(root/'report')]
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)

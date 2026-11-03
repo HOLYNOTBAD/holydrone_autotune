@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!-- holydrone_autotune 包清单；以下依赖说明不改变版本、许可证或依赖声明。 -->
 <package format="2">
   <name>holydrone_autotune</name>
   <version>0.1.0</version>
@@ -7,22 +8,40 @@
   <maintainer email="holynotbad@users.noreply.github.com">HOLYNOTBAD</maintainer>
   <license>BSD-3-Clause</license>
 
+  <!-- Catkin 构建工具 -->
   <buildtool_depend>catkin</buildtool_depend>
 
+  <!-- 构建时生成本包 ExperimentEvent 与 ExperimentCommand 接口 -->
   <build_depend>message_generation</build_depend>
+  <!-- 运行时使用生成的消息与服务 -->
   <exec_depend>message_runtime</exec_depend>
 
+  <!-- 会话目录与配置归档使用的文件系统库 -->
   <depend>boost</depend>
+  <!-- 飞控状态、角速度设定值与参数/模式服务消息 -->
   <depend>mavros_msgs</depend>
+  <depend>eigen</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <!-- C++ ROS 节点与通信 -->
   <depend>roscpp</depend>
+  <!-- 状态字符串、完成与健康布尔消息 -->
   <depend>std_msgs</depend>
+  <!-- 人工启动、停止与状态查询的 Trigger 服务 -->
   <depend>std_srvs</depend>
+  <!-- C++ 配置、网络权重和事件 YAML 读写 -->
   <depend>yaml-cpp</depend>
 
+  <!-- 离线分析绘图 -->
   <exec_depend>python3-matplotlib</exec_depend>
+  <!-- 离线数组计算和测试 -->
   <exec_depend>python3-numpy</exec_depend>
+  <!-- Python 配置和报告读写 -->
   <exec_depend>python3-yaml</exec_depend>
+  <!-- Python ROS 服务客户端或辅助节点 -->
   <exec_depend>rospy</exec_depend>
+  <exec_depend>mavros</exec_depend>
 
+  <!-- Catkin Python 测试入口 -->
   <test_depend>python3-nose</test_depend>
 </package>

@@ -1,4 +1,9 @@
+# 人工加载候选或启动激励；服务响应 success 表示业务受理结果。
+# load 受理后异步写参数，必须等 READY；run 需参数确认且 Offboard 状态有效。
+# load: 配置中的候选 ID；run: low 或 high。
 string value
 ---
+# 是否受理；不等于异步参数加载已完成。
 bool success
+# 状态、拒绝原因或后续等待提示。
 string message

@@ -1,9 +1,11 @@
+"""验证一阶合成脉冲的跟踪指标、不可测返回值及方向分组，无需 ROS Master。"""
 import unittest
 import numpy as np
-from holydrone_autotune.autotune_analysis import pulse_metrics, summarize
+from autotune_analysis import pulse_metrics, summarize
 
 
 class AnalysisTest(unittest.TestCase):
+    """使用合成角速度脉冲验证指标与汇总边界。"""
     def test_first_order_response(self):
         t = np.arange(0, .25, .001)
         y = 1-np.exp(-t/.02)

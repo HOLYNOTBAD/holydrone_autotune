@@ -1,126 +1,266 @@
-# PX4 rate 环在线候选试验（ROS 1）
+# holydrone_autotune
 
-入口 `brct_autotune_fsm.cpp`，与原有 `identification_fsm` 独立。按确认的接口选择，使用 ROS 1 Noetic + MAVROS 的 MAVLink body-rate 控制，不发布 ROS 2 `/fmu/*`。不解锁、不切模式、不自动恢复、不自动选优；一次启动可测试整个候选列表。
+ROS 1 + MAVROS 的 PX4 角速度环候选参数试验包：**依次写入预设 PID 候选，施加相同角速度脉冲，记录实际响应，再离线比较各组指标。**
+当前不拟合一阶模型，不自动生成新候选、排名或写回最优参数；下一轮参数由操作者决定。
 
-## 接口与数据约定
+```text
+候选 YAML → 写入 PX4 并读回确认 → 人工进入 OFFBOARD → 逐候选 low/high 脉冲
+  → ROS 事件 + PX4 ULog → 时间对齐与分段 → 跟踪指标、汇总表和曲线
+```
 
-- `/mavros/setpoint_raw/attitude`：200 Hz，`IGNORE_ATTITUDE`，角速度和推力有效。MAVLink setpoint 流同时作为 Offboard 存活信号，无需单独 ROS 2 heartbeat。
-- 配置、事件、报告均使用 FRD。MAVROS 消息使用 FLU，因此 pitch/yaw 发布前取反；MAVROS 再转换到 PX4 FRD。推力为归一化正标量 `collective_thrust`，对应 PX4 负 Z 推力。
-- 必须核对 MAVROS `setpoint_raw/thrust_scaling: 1.0` 已配置，并只运行一个 setpoint 发布节点。不要同时启动原有激励节点或 policy FSM。
-- `/mavros/state` 的 `connected && mode == OFFBOARD` 允许运行；收到退出消息即清零并 ABORT。状态超过 2 秒未更新，也视为无法确认 Offboard 并中止。
-- 未运行期间仍发送零角速度和配置的固定推力。零角速度不是位置悬停，也不会自动保持高度或恢复水平。
-- 参数通过 `/mavros/param/set` 写入，等待 1.8 秒，再 `param/pull(force_pull=true)` 强制刷新，逐项 `param/get` 验证。全量刷新可能再耗时数秒。容差为 `1e-7 + 1e-5*abs(target)`。
-- 参数服务运行在后台，200 Hz 发布不等待 MAVLink 事务。加载未完成时不能运行或再次加载。写入部分成功后失败会保留实际已写入的参数，明确标记失败且禁止激励；不会自动回滚。
+核心实现：[在线状态机](src/brct_autotune_fsm.cpp)、[离线入口](scripts/autotune_analyze.py)、
+[指标计算](src/autotune_analysis.py)。一阶响应及物理参数辨识属于另一个包 `holydrone_identification`。
 
-官方接口依据：[PX4 Offboard](https://docs.px4.io/v1.16/en/flight_modes/offboard)、[MAVROS 坐标变换实现](https://github.com/mavlink/mavros/blob/master/mavros/src/plugins/setpoint_raw.cpp)、[MAVROS 参数缓存实现](https://github.com/mavlink/mavros/blob/master/mavros/src/plugins/param.cpp)。
+## 1. 候选参数与激励
 
-## 构建、启动
+### 试验哪些参数
+
+当前 [brct_autotune.yaml](config/brct_autotune.yaml) 针对 **holydrone_lite / airframe 22001 仿真**，对 FRD roll 轴做 P 粗搜索：
+
+| 候选 | P | I | D | FF | K |
+| --- | --- | --- | --- | --- | --- |
+| `p_0p90` | 0.0486 | 0 | 0.0014 | 0 | 1 |
+| `p_1p00` | 0.0540 | 0 | 0.0014 | 0 | 1 |
+| `p_1p10` | 0.0594 | 0 | 0.0014 | 0 | 1 |
+
+旧候选 P=0.135～0.165、D=0.003 在 lite 模型中产生约 10 Hz 持续 roll 振荡；仅退回 P≈0.08、D=0.001 仍存在明显阶跃振铃，因此最终搜索中心改为 P=0.054、D=0.0014，并同步更新 lite airframe 的默认 roll 增益。恢复 baseline 使用 P/I/D=0.054/0.074/0.0014，PD 试验候选仍将 I 置零。这些参数不代表其他机型或实机已验证。
+
+这些是预先指定的 PX4 参数，不是辨识结果。`axis` 可选 roll/pitch/yaw，每组必须提供对应轴完整的 P/I/D/FF/K。
+`search_stage: pd` 要求 I=FF=0，K 固定为 baseline K；`manual` 允许非零 I/FF，但仍固定 K。
+`baseline` 是人工填写的恢复值，不是启动时自动备份的飞控参数。
+
+连接后预加载第一候选。每次写入先强制同步参数表，确认参数存在，写入后等待 1.8 s，
+再强制刷新并读回，满足下式才视为成功：
+
+$$
+|p_{\mathrm{read}}-p_{\mathrm{target}}|\le 10^{-7}+10^{-5}|p_{\mathrm{target}}|
+$$
+
+事务在后台运行，避免阻塞 200 Hz 指令发布。部分写入后失败会保留已生效参数，停止后续激励，不自动回滚。
+
+### 使用什么激励
+
+每个候选依次执行 low、high 两档；当前幅值为 60、120 deg/s（约 1.047、2.094 rad/s）。
+每档开始先回中，每次 repetition 执行：
+
+```text
++A 0.25 s → 回中 → −A 0.25 s → 回中 → −A 0.25 s → 回中 → +A 0.25 s → 回中
+```
+
+每档重复 2 次，即 8 个脉冲；默认 3 个候选共 6 个 trial、48 个脉冲，纯脉冲时间为 12 s。
+实际总时长还包含参数事务与反馈决定的回中时间，不能固定为 12 s。
+脉冲期间只给所选轴非零角速度指令；每个脉冲停止后均闭环回中，实测稳定后才开始下一个脉冲。
+
+配置、事件和离线报告使用 FRD（前、右、下）；MAVROS 发布使用 FLU（前、左、上），pitch/yaw 发布前取反。
+指令通过 `/mavros/setpoint_raw/attitude` 发送，归一化推力为正标量。应使用
+`setpoint_raw/thrust_scaling: 1.0`，并确保只有一个节点发布控制设定值。
+
+## 2. 定高、回中与试验推进
+
+### 推力基准和定高
+
+在已解锁 POSCTL 稳定悬停时，从 `/mavros/setpoint_raw/target_attitude.thrust` 获取飞控回传推力；
+进入 OFFBOARD 时锁定为本航次基准 $T_h$，同时记录 ENU 位置和航向。
+不从 `MPC_THR_HOVER` 或固定配置值回退；推力、位姿、速度反馈必须新鲜。
+
+[定高控制](include/holydrone_autotune/altitude_control.hpp) 全程工作。设高度误差 $e_z=z_0-z$、向上速度 $v_z$，其核心关系为：
+
+$$
+a_z=\operatorname{clip}(k_p e_z-k_d v_z+I_z,\,-a_{\max},a_{\max}),\qquad
+T=\operatorname{clip}\left(\frac{T_h(1+a_z/g)}{\cos\theta},T_{\min},T_{\max}\right)
+$$
+
+$\theta$ 表示机体倾角，$g=9.80665$ m/s²。积分项 $I_z$ 对高度误差积分，并进行限幅和抗饱和处理。
+当前 $k_p=2.0$、$k_d=2.5$、$k_i=0.4$，加速度修正限幅为 ±3 m/s²，推力限制在 [0.05, 0.8]。
+这意味着脉冲中的总推力随高度和倾角变化，不是固定推力实验。
+
+### 回中控制
+
+[回中控制](include/holydrone_autotune/recenter_control.hpp) 先根据水平位置误差和速度生成目标水平加速度：
+
+$$
+\mathbf a_{xy}=k_{pos}(\mathbf p_{0,xy}-\mathbf p_{xy})-k_{vel}\mathbf v_{xy}
+$$
+
+再将其转换为目标倾角，保持初始航向，用当前姿态到目标姿态的四元数误差生成机体角速度指令。
+当前水平增益为 0.8、1.8，目标倾角上限 12°，角速度向量模长上限 2 rad/s。
+回中阶段仍用角速度/推力接口；其角速度指令通常不为零，不能当作零输入响应分析。
+
+只有下列条件在连续新鲜 IMU 样本中满足 0.3 s 才开始下一个脉冲（包括第一脉冲）：
+
+| 回中条件 | 当前阈值 |
+| --- | --- |
+| 高度误差 / 水平偏移 | ≤ 0.15 m / ≤ 0.75 m |
+| 三维速度模长 | ≤ 0.3 m/s |
+| 倾角 / 航向误差 | ≤ 5° / ≤ 5° |
+| 实测三轴角速度模长 | ≤ 0.2 rad/s（约 11.5°/s） |
+
+角速度来自 `/mavros/imu/data`，不使用设定值代替实测值。未满足回中条件、重复时间戳或采样间断会重置稳定计时。陈旧反馈不用于推进回中，反馈失效时暂停控制指令发布；不因该检查主动请求 POSCTL。PX4 自身的 Offboard 失联行为仍由飞控配置决定。
+
+不设置倾角、高度偏差、空间偏移、垂直速度的自动退出阈值，由操作者手动接管。手动退出 Offboard 后中止试验。回中超过 `recovery.timeout_s`（默认 8 s）或脉冲调度超时仍中止并请求 POSCTL；FCU 状态超过 2 s 未更新也会中止试验。
+
+### 自动序列的边界
+
+人工进入 OFFBOARD 后固定自动遍历全部候选 low → high，无需额外开关；
+最后一档也完成回中后，才请求 POSCTL，并以飞控模式回传确认序列完成。
+中止后重新满足条件并进入 OFFBOARD，会从首组 low 重启；完整完成后需新节点会话才能再次自动遍历。
+
+**退出 OFFBOARD、关闭节点或试验完成都不会恢复原 PID，最后生效的候选仍留在飞控中。**
+需要恢复时调用 `/restore_baseline` 并确认 `BASELINE_RESTORED`。
+`/stop_trial` 仅中止试验，仍在 OFFBOARD 时继续回中，不主动切模式，也不取消已开始的参数事务。
+
+## 3. 离线数据与数学方法
+
+### 哪些数据起什么作用
+
+| 数据 | 作用 |
+| --- | --- |
+| `events.yaml` | 候选 ID、参数读回、幅值、方向、trial 和脉冲边界、完成/中止状态 |
+| `timesync.csv` | ROS 与 PX4 时钟偏移；PASSTHROUGH 下仅有表头是正常情况 |
+| `clock.yaml` | 记录本次 use_sim_time、MAVROS 时钟模式及允许的消息先后差 |
+| `vehicle_rates_setpoint` | 飞控实际接收到的角速度设定值；用于对齐校验和绘图 |
+| `vehicle_angular_velocity` | 实测角速度；用于计算响应指标 |
+| `vehicle_torque_setpoint` | 所选轴归一化力矩指令；用于绘图，不是实测力矩 |
+| `control_allocator_status` | 所选轴未分配力矩；用于统计控制分配未实现的时长 |
+| `vehicle_attitude`、`vehicle_local_position`、`battery_status`、`vehicle_status` | 当前分析要求这些话题存在，但不据此生成飞行健康评分 |
+
+节点保存事件、原始配置和时间同步信息，不录制 ROS bag。飞行遥测由 PX4 ULog 记录。
+角速度、设定值和力矩建议记录至少 200 Hz；实际采样率会限制短脉冲和频谱指标的可信度。
+
+### 对齐与切分
+
+将 ROS 事件时间转换为 PX4 时间：$t_{PX4}=t_{ROS}-\Delta t$。
+节点先等待有效 `/clock` 再建立会话，不记录启动前的零时刻。仅在仿真直通模式容许不超过 8 ms 的数据先于 `/clock` 到达；不改变运动稳定门槛。
+
+Gazebo Classic 仿真入口使用 MAVROS `PASSTHROUGH`，保留共享仿真时钟的采样时间，此时 `timesync.csv` 只有表头是正常现象；分析仍须逐脉冲验证共享时钟，不直接无条件假设零偏移。实机入口保留 MAVLINK 同步。
+
+默认先对 `timesync.csv` 的重复 ROS 时间戳保留最后一条，再对偏移逐事件插值，拒绝缺少覆盖或附近 2 s 内没有同步样本的情况。事件或同步记录出现真正的时间倒退时，要求按时钟重置拆分会话。
+
+TIMESYNC 不可用时，仅当 ULog 明确标记 `ver_hw=PX4_SITL`，且至少四个包含正负方向的脉冲全部通过共享时钟下的覆盖、目标幅值及起始边沿校验，才自动采用零偏移。该路径不搜索或猜测任意时钟偏移。实飞或无法验证的日志仍报错，可用实测 `--ros-minus-px4-s` 显式覆盖。
+
+`report.json` 的 `clock_alignment` 记录采用的来源、重复样本数、TIMESYNC 失败原因和验证脉冲数。仿真回退时还记录设定值边沿的观测延迟范围；其中包含时钟、传输和采样误差，不能作为精密链路延迟标定。
+
+每个脉冲按开始事件及下一边界切分，当前 `PULSE_FINISHED` 明确标记结束。
+只分析已 `TRIAL_FINISHED` 的 trial，中止或不完整 trial 进入 `excluded_trials`。
+再检查去掉首尾各 0.03 s 的脉冲中央区间，ULog 设定值与事件目标的绝对误差中位数须
+≤ `max(0.05 rad/s, 目标幅值的 15%)`，否则报错。该检查能发现错日志、时钟/坐标错误或指令被抢占，
+但不等于精密标定了 ROS 发布到飞控生效的传输延迟。
+
+### 计算哪些指标
+
+设脉冲恒定目标为 $r$、实测角速度为 $y(t)$、误差 $e(t)=r-y(t)$。
+报告仅输出以下三个核心指标，计算使用事件指定的恒定目标；对比图展示 ULog 目标与实际角速度。
+
+| 指标 | 计算方法与含义 |
+| --- | --- |
+| `rise_time_s` | 以本段首个实测值 $y_0$ 为起点，计算 $(y-y_0)/(r-y_0)$ 首次到达 10% 和 90% 的时间差，兼容正负反转 |
+| `overshoot_percent` | $100\max(0,\max(\operatorname{sign}(r)y)-\lvert r\rvert)/\lvert r\rvert$，超过目标幅值的比例 |
+| `tracking_rmse` | $\sqrt{\operatorname{mean}(e^2)}$，整体跟踪误差；单位 rad/s |
+
+上升阈值未观测到时，上升时间返回 `null`。稳定性需结合响应曲线和独立的稳定性审计判断。
+
+## 4. 输出与结果解释
+
+| 输出 | 内容 |
+| --- | --- |
+| `report.json` | 逐脉冲指标、分组汇总、正负方向差异、排除的 trial、时钟与日志来源 |
+| `summary.csv` | 每个候选 × 幅值一行，合并正负脉冲的 RMSE、超调、上升时间算术平均值；单位分别为 rad/s、%、ms |
+| `comparison_<axis>_<幅值>deg_s.png` | 同轴、同幅值的完整试验对比，包含回中；每个 trial 一行，标注读回 PID 参数 |
+| `comparison_<axis>_<幅值>deg_s_zoom.png` | 仅显示激励脉冲，按事件起点对齐，去除回中，保留脉冲内真实时间比例 |
+
+JSON 每组报告重复脉冲的中位数、四分位距 IQR（P75−P25）及有效计数，并计算正方向减负方向的中位数差异。
+比较时应在相同幅值与方向下看响应速度、误差和超调，同时检查重复性。
+代码没有综合评分、最佳 PID 或飞行验收通过标志；成功生成报告只表示数据通过当前分析检查。
+当前标准入口不生成 `flight_health.json` 或额外健康总览图，历史结果文件不能当作当前功能承诺。
+
+## 5. 构建、采集与分析
+
+包内 `_scripts/` 放启动/停止入口，`scripts/` 放 Python 程序，`data/` 放本地实验产物：
+
+```text
+data/<会话名>/          # 配置、events.yaml、timesync.csv
+data/<会话名>_px4/      # PX4 运行目录与 ULog
+data/<会话名>_result/   # report.json、summary.csv、曲线
+```
+
+构建与仿真启动（从仓库根目录进入 `deployment`；会话名仅为示例，须选尚不存在的目录）：
 
 ```bash
-cd /home/holy/QUAD_RL/deployment
+cd deployment
 source /opt/ros/noetic/setup.bash
 catkin_make
 source devel/setup.bash
-# MAVROS 需另行启动并连接到当前飞控
+OUTPUT="$PWD/src/holydrone_autotune/data/roll_p_new" \
+  ./src/holydrone_autotune/_scripts/autotune.sh
+```
+
+该 Shell 入口需要 GNOME Terminal，默认启动 SITL/MAVROS 与试验节点，不自动解锁或起飞。
+人工在 POSCTL 起飞并稳定悬停，等待候选 READY、推力及反馈就绪，再进入 OFFBOARD。
+完整序列结束后确认 POSCTL，人工降落；需要时恢复 baseline。停止本包会话使用：
+
+```bash
+./src/holydrone_autotune/_scripts/kill.sh
+```
+
+**当前 ULog 自动下载入口缺失：** launch 虽保留 `download_ulog`，但
+`scripts/download_flight_ulog.py` 不存在；`MODE=real_flight` 的 Shell 分支会启用它，当前不可直接按此路径依赖自动下载。
+实飞可独立启动 MAVROS，再直接运行以下 launch，手动从 SD 卡或 QGroundControl 获取 ULog：
+
+```bash
 roslaunch holydrone_autotune brct_autotune.launch \
-  output:=/data/roll_p_coarse_01_flight01
+  output:="$(rospack find holydrone_autotune)/data/roll_p_real_new" \
+  download_ulog:=false
 ```
 
-`output` 必须为全新目录；重启使用另一目录。节点保存原始 YAML、逐事件刷盘的 `events.yaml` 和用于对齐的 `timesync.csv`。不启动 record，不录制 ROS bag；所有飞行遥测均使用 PX4 ULog（`.ulg`）。
-
-`config:=/absolute/path/candidates.yaml` 可替换配置。每组必须且只能包含所选轴的 P/I/D/FF/K。默认 `search_stage: pd` 强制所有候选 I=FF=0，K 固定为 baseline K；后续 I/FF 搜索使用 `manual`，K 仍固定。baseline 可保留原始 I/FF，以便恢复实际基线。K0 应由操作者填入，程序不会读取 Autotune 结果或推断 K0。重复/保留 ID、NaN、缺项、空候选会导致启动失败。
+可加 `config:=/绝对路径/candidates.yaml` 替换候选配置。调试服务如下；自动序列或退出请求进行中拒绝人工 load/run/next/baseline。
 
 ```bash
-rosrun holydrone_autotune brct_autotune_command.py load p_1p00
-rosrun holydrone_autotune brct_autotune_command.py status
-# 等待 READY，操作者遥控进入 Offboard
-rosrun holydrone_autotune brct_autotune_command.py run low
-# 等待 FINISHED 后再人工触发
-rosrun holydrone_autotune brct_autotune_command.py run high
-rosrun holydrone_autotune brct_autotune_command.py stop
-# 人工退出 Offboard，再选下一组；next 从当前列表位置向后，不循环
-rosrun holydrone_autotune brct_autotune_command.py next
-rosrun holydrone_autotune brct_autotune_command.py baseline
-```
-
-也可直接调用服务：
-
-```bash
+rosservice call /get_experiment_status
+rosservice call /stop_trial
+rosservice call /restore_baseline
+# 自动序列未运行时可调用以下调试服务；进入 OFFBOARD 会自动启动序列
 rosservice call /load_candidate "value: 'p_1p00'"
 rosservice call /run_trial "value: 'low'"
-rosservice call /stop_trial
 rosservice call /next_candidate
-rosservice call /restore_baseline
-rosservice call /get_experiment_status
 ```
 
-load/next/baseline 返回成功仅表示接受异步加载，必须等 `PARAMETER_CONFIRMED`/READY；baseline 另发 `BASELINE_RESTORED`。运行中禁止加载、恢复和第二次 run。stop 中止激励，但不取消已经开始的参数写入。失败原因及完整读回值可查 status 和事件。ABORTED/FINISHED 允许人工再次 run（需已确认参数且仍在 Offboard）；不存在自动下一组。
-
-## 激励与事件
-
-每个 repetition：`0 settle_s → +A pulse_duration_s → -A pulse_duration_s → 0 settle_s → -A pulse_duration_s → +A pulse_duration_s → 0 1.0s`。默认每轮 3.5 秒，两轮 7 秒。low/high 分别对应 `levels_deg_s` 的两项，发送时转为 rad/s。单调时钟决定脉冲时序；若调度延误跳过整段脉冲，标记 ABORTED，不补发虚构的脉冲事件。
-
-`/pid_experiment/event` 类型为本包 `ExperimentEvent`：所需字段外增加 `trial_id`、`repetition`、`phase`（从 0 计数）、单调时钟 `steady_s` 和 `detail`。参数字段为 YAML 映射字符串，日志中为映射。事件包括全部需求事件，以及 `SESSION_START`、`PULSE_ZERO`、`PARAMETER_APPLY_FAILED`。脉冲事件时间是本机发布时刻，不宣称为飞控接收时刻；实际控制以 ULog setpoint 为证据。
-
-退出 Offboard **不会恢复 rate PID**。操作者必须手动调用 baseline 并确认恢复成功，或降落后恢复。关闭节点也不会恢复参数。手动停止试验不会切换飞行模式。
-
-## 记录与飞行流程
-
-飞行数据全部由 PX4 ULog 记录。节点仅额外保存候选配置、参数读回值、试验事件和时间同步元数据，供离线分段与时钟对齐。
-
-飞前确认 PX4 SD 卡日志启用，且 ULog 包含以下主题（可能需要调整固件 logger topic 配置）：
-
-```
-vehicle_rates_setpoint
-vehicle_angular_velocity
-vehicle_torque_setpoint
-control_allocator_status
-vehicle_attitude
-vehicle_local_position
-battery_status
-vehicle_status
-```
-
-角速度、setpoint、torque 建议至少 200 Hz；高频分析需要高于两倍截止频率的采样率。缺失主题时分析脚本明确报错，不填造零数据。当前 ROS 1 方案无需修改 DDS topic 配置。ULog 由 PX4 自身记录；节点不自动下载日志。
-
-1. 检查 YAML、原始 baseline 和 K0，启动 MAVROS 和试验节点，确认 TIMESYNC 数据有效。
-2. 人工起飞并 Position 悬停，load 候选，等 READY。
-3. 人工进入 Offboard，run low；结束后人工决定 run high。
-4. 人工退出 Offboard，load 另一候选，重复同一流程。
-5. 人工 baseline，确认 BASELINE_RESTORED，降落。
-6. 从 SD 卡或 QGroundControl 下载本次 ULog 到会话目录，保留 ULog、YAML、事件和时间同步文件。
-7. 离线分析并人工决定下一轮配置。可以依次进行 P 粗/细搜索、D 粗搜索、P/D 小网格、I、FF、pitch、yaw；程序只接受预定义列表。
-
-## 离线分析
-
-运行分析的 Python 环境需要 pyulog、numpy、matplotlib、PyYAML。
+离线环境与分析命令（在仓库根目录执行，无需 ROS 环境）：
 
 ```bash
-rosrun holydrone_autotune brct_autotune_analyze.py \
-  --session /data/roll_p_coarse_01_flight01 \
-  --ulog /data/roll_p_coarse_01_flight01/flight.ulg \
-  --output /data/roll_p_coarse_01_flight01/report
+conda env create -f deployment/src/holydrone_autotune/environment.yml
+bash deployment/src/holydrone_autotune/_scripts/autotune_analyze.sh \
+  --session roll_p_new
 ```
 
-`report` 应为全新目录。脚本利用节点从 MAVROS `timesync_status` 保存到 `timesync.csv` 的时钟偏移 将 ROS 事件转换到 PX4 boot 时间，逐事件插值偏移，拒绝缺失或陈旧的覆盖；还校验脉冲中央段的 ULog setpoint 方向/幅度以发现选错日志、时钟偏移或抢占发布。可用实测 `--ros-minus-px4-s` 显式覆盖偏移，不会默认用首样本对齐。此校验不是精密延迟标定；ROS 发布到 PX4 生效的传输延迟仍影响短脉冲指标。
+会话简称在包内 `data/` 查找；默认选择 `<会话名>_px4` 中唯一 `.ulg`，输出到 `<会话名>_result`。
+多个 ULog 时用 `--ulog /路径/flight.ulg` 指定；用 `--output /全新结果目录` 指定其他输出。
+默认会自动检查 TIMESYNC；仅已通过全部脉冲校验的 PX4_SITL 日志可采用共享时钟回退。只有确认时钟偏移后才传 `--ros-minus-px4-s`，不要照搬其他航次的零偏移。
+Shell 支持 `CONDA_EXE`、`CONDA_ENV` 等环境变量覆盖，命令行分析参数优先。
+采集会话和分析输出均拒绝覆盖已有目录；分析全部成功后才生成最终结果目录。
 
-输出每 trial 的 setpoint/actual、tracking error、torque 图及 `report.json`：
+本地测试入口为 `catkin_make run_tests_holydrone_autotune`，
+隔离 mock/SITL 流程与验证边界见 [test/SITL.md](test/SITL.md)。文档说明不代表当前机型已完成实飞验收。
 
-- 每个正负脉冲的 10–90% 上升时间（相对本段初始实际速率的阶跃）、目标幅度超调百分比、IAE、ITAE、tracking RMSE。
-- 紧邻该脉冲的零速率窗口内回零时间（进入 ±5%A 且持续至窗口末尾至少 0.1 秒）、回零 RMS。直接反向切换的脉冲没有回零窗口，值为 null；未达到阈值也为 null。
-- 实际 rate 去均值、重采样后的单边频谱高频能量，默认 `--hf-hz 30`，单位 `(rad/s)^2`；截止频率不低于 Nyquist 时为 null。短脉冲中的瞬态也贡献高频能量，不能单凭此值判断振荡。
-- 所选轴 allocator `abs(unallocated_torque) > 1e-5` 的累计时间，使用零阶保持积分。
-- 按候选/幅度/方向汇总所有有效重复脉冲的中位数、IQR、有效计数，另列正减负差异。中止或不完整 trial 不参与汇总，列入 excluded_trials。
 
-不自动排名、不自动选择参数、不向飞控写回。ULog 与事件对齐检查通过不等于完成实机验收。
+### Lite 内环稳定性验证（2026-11-03）
 
-## 本地验证
+最终证据位于 `data/lite_roll_pd_02_flight09_result/`：48 个脉冲、6 个 trial 全部完成，ULog 无 dropout；每次起始前 0.3 秒的完整日志窗口均满足稳定判据。最大掉高 0.037 m，进入 Offboard 前 roll RMS 为 0.013 rad/s（flight04 为 2.943 rad/s）。三组候选脉冲超调中位数约 5.6%、11.2%、20.0%；已消除旧参数的持续振荡，但不声称没有阶跃瞬态或任意增益都稳定。
+
+`comparison.png` 显示前后对比；`flight_health.json` 和 `pulse_start_stability.csv` 保存数值及逐次证据。完整复现入口为 `test/sitl_sequence.py`，会在隔离 ROS/Gazebo master 上操作仿真机、落地并解除武装。正式 Shell 入口仍由操作者起飞；每次默认使用带时间戳的新目录，避免复用旧 PX4 参数。已有 runtime 的 BSON 不会被 airframe 的 `set-default` 自动覆盖。
+
+### 读取飞控当前 PID
+
+`_scripts/autotune_getPID.sh` 自动启动 MAVROS，等待飞控连接，强制刷新参数表后读取所选轴的 P/I/D/FF/K。默认 roll，结果保存至 `config/brct_PID.yaml` 的 `baseline` 映射；全部读取成功才替换已有文件。此文件不会自动修改试验配置，也不会向飞控写参数。
 
 ```bash
-catkin_make run_tests_holydrone_autotune
-catkin_test_results build/test_results/holydrone_autotune
-source devel/setup.bash
-/usr/bin/python3 src/holydrone_autotune/test/autotune_mock_integration.py
+# 仿真：先启动 PX4 SITL，本脚本通过 UDP 启动 MAVROS 并读取。
+MODE=simulation bash deployment/src/holydrone_autotune/_scripts/autotune_getPID.sh
+# 实机：按实际串口和 system ID 修改。
+MODE=real_flight MAVROS_FCU_URL=/dev/ttyACM0:115200 MAVROS_TGT_SYSTEM=1 \
+  bash deployment/src/holydrone_autotune/_scripts/autotune_getPID.sh
+# 可追加 --axis pitch 或 --axis yaw；每次只保存所选轴，替换同一输出文件。
 ```
 
-集成测试使用独立 ROS master 和 mock 参数服务，不接触飞控。实机 200 Hz 链路吞吐、PX4 实际参数应用、遥控模式切换、ULog 主题和时钟质量仍需 SITL/台架/飞行验证。
+默认 `MODE=simulation`，使用 `udp://:14540@127.0.0.1:14557`、system ID 1；`MODE=real_flight` 默认使用 `/dev/ttyTHS0:2000000`、system ID 2。两种模式均支持 `MAVROS_FCU_URL` 和 `MAVROS_TGT_SYSTEM` 覆盖。本脚本仅启动 MAVROS，不启动 PX4/Gazebo。连接、参数同步与读取默认总超时 120 秒，可传 `--timeout` 修改，`--output` 可修改保存路径。成功、失败或中断时均关闭本脚本启动的 MAVROS。
+
+如果已有 `/mavros` 节点，Shell 拒绝重复启动；可在加载 ROS 环境后直接运行 `scripts/autotune_getPID.py` 使用现有 MAVROS，该方式不会关闭现有节点。

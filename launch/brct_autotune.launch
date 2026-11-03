@@ -1,11 +1,27 @@
+<!-- 启动 holydrone_autotune 的 brct_autotune；参数按 arg 显式传递，节点参数位于各自私有空间。 -->
 <launch>
+  <!-- 激励或候选 YAML 路径；传给被包含 launch 或节点配置 -->
   <arg name="config" default="$(find holydrone_autotune)/config/brct_autotune.yaml"/>
   <!-- Required unique directory; the FSM creates it and archives the YAML. -->
+  <!-- 必填的新会话输出目录；避免复用已存在记录 -->
   <arg name="output"/>
+  <!-- MAVROS 接口前缀；默认 /mavros -->
   <arg name="mavros_namespace" default="/mavros"/>
+  <arg name="download_ulog" default="false"/>
+  <arg name="remote_log_dir" default="/fs/microsd/log"/>
+  <node if="$(arg download_ulog)" pkg="holydrone_autotune" type="download_flight_ulog.py"
+        name="download_flight_ulog" output="screen">
+    <param name="output" value="$(arg output)_px4"/>
+    <param name="mavros_namespace" value="$(arg mavros_namespace)"/>
+    <param name="remote_log_dir" value="$(arg remote_log_dir)"/>
+  </node>
+  <!-- 运行自动候选序列；required=true，节点退出会结束本次 launch -->
   <node pkg="holydrone_autotune" type="brct_autotune_fsm" name="brct_autotune_fsm" output="screen" required="true">
+    <!-- 激励或候选 YAML 路径；传给被包含 launch 或节点配置 -->
     <param name="config" value="$(arg config)"/>
+    <!-- 必填的新会话输出目录；避免复用已存在记录 -->
     <param name="output" value="$(arg output)"/>
+    <!-- MAVROS 接口前缀；默认 /mavros -->
     <param name="mavros_namespace" value="$(arg mavros_namespace)"/>
   </node>
 </launch>
