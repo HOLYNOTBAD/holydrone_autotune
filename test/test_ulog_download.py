@@ -42,7 +42,7 @@ class DownloadTests(unittest.TestCase):
             # 短读和分包不能截断结果。
             return SimpleNamespace(success=True, r_errno=0, data=data[offset:offset+min(size, 137)])
         ftp = dict(open=lambda **kw: SimpleNamespace(success=True, size=len(data)), read=read,
-                   close=lambda **kw: closed.append(kw['file_path']))
+                   close=lambda **kw: (closed.append(kw['file_path']) or SimpleNamespace(success=True)))
         return module.Downloader(ftp, '/fs/microsd/log', root, check, lambda *args: None), closed
 
     def test_complete_file_and_retry(self):
@@ -79,6 +79,17 @@ class DownloadTests(unittest.TestCase):
                 d.download('/fs/microsd/log/growing.ulg', 1300, 1)
             self.assertFalse(list(Path(tmp).rglob('*.ulg')))
             self.assertEqual(len(closed), 2)
+
+    def test_progress_reports_bytes_and_completion(self):
+        data = b'ULog\x01\x12\x35'+b'x'*2000
+        with tempfile.TemporaryDirectory() as tmp:
+            downloader, _ = self.fixture(tmp, data)
+            lines = []
+            downloader.progress = lambda fmt, *args: lines.append(fmt % args)
+            downloader.download('/fs/microsd/log/flight.ulg', len(data), 1)
+            self.assertTrue(any('100.0%' in line and '2007/2007 bytes' in line for line in lines))
+            self.assertTrue(any('KiB/s' in line for line in lines))
+            self.assertTrue(lines[-1].startswith('ULog saved:'))
 
     def test_inventory_and_new_sd_card(self):
         with tempfile.TemporaryDirectory() as tmp:

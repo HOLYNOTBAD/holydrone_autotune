@@ -2,7 +2,7 @@
 # 围绕 lite 默认 P=0.054、D=0.0014 搜索；原 P=0.135~0.165、D=0.003 在此模型产生约10Hz振荡。
 # 不可直接作为另一机型或实机的已验证参数。
 # 候选写入会改变飞控 PID；异步写入并读回确认后自动开始激励。
-experiment_id: lite_roll_pd_02  # 写入事件及离线报告的非空会话标识
+experiment_id: lite_roll_pd_01  # 写入事件及离线报告的非空会话标识
 axis: roll  # FRD 激励轴；可选 roll、pitch、yaw
 # 推力由已解锁 POSCTL 下的 target_attitude.thrust 实时采集；每次进入 Offboard 时锁定。
 # 切换前先稳定悬停，并等待终端提示推力已就绪；不使用固定推力回退。
@@ -14,11 +14,32 @@ baseline:  # 人工恢复使用的 P/I/D/FF/K；不会自动恢复
   MC_ROLLRATE_D: 0.0014  # roll 角速度环微分项；须为有限非负数
   MC_ROLLRATE_FF: 0.000  # roll 角速度环前馈项；须为有限非负数
   MC_ROLLRATE_K: 1.000  # roll 环总增益；须为有限正数，所有候选保持 baseline 值
-candidates:  # 按列表顺序自动加载的候选；ID 非空、唯一且不能为 baseline
-  - {id: p_0p90, MC_ROLLRATE_P: 0.0486, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.0014, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}  # 本组含 ID 与完整 P/I/D/FF/K
-  - {id: p_1p00, MC_ROLLRATE_P: 0.0540, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.0014, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}  # 本组含 ID 与完整 P/I/D/FF/K
-  - {id: p_1p10, MC_ROLLRATE_P: 0.0594, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.0014, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}  # 本组含 ID 与完整 P/I/D/FF/K
-
+candidates:  # 5×5 PD 网格；按 P 从小到大，每个 P 下依次测试 5 个 D；I=FF=0，K=1
+  - {id: p_0p80_d_0p80, MC_ROLLRATE_P: 0.0432, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00112, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p80_d_0p90, MC_ROLLRATE_P: 0.0432, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00126, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p80_d_1p00, MC_ROLLRATE_P: 0.0432, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00140, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p80_d_1p10, MC_ROLLRATE_P: 0.0432, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00154, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p80_d_1p20, MC_ROLLRATE_P: 0.0432, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00168, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p90_d_0p80, MC_ROLLRATE_P: 0.0486, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00112, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p90_d_0p90, MC_ROLLRATE_P: 0.0486, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00126, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p90_d_1p00, MC_ROLLRATE_P: 0.0486, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00140, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p90_d_1p10, MC_ROLLRATE_P: 0.0486, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00154, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_0p90_d_1p20, MC_ROLLRATE_P: 0.0486, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00168, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p00_d_0p80, MC_ROLLRATE_P: 0.0540, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00112, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p00_d_0p90, MC_ROLLRATE_P: 0.0540, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00126, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p00_d_1p00, MC_ROLLRATE_P: 0.0540, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00140, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p00_d_1p10, MC_ROLLRATE_P: 0.0540, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00154, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p00_d_1p20, MC_ROLLRATE_P: 0.0540, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00168, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p10_d_0p80, MC_ROLLRATE_P: 0.0594, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00112, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p10_d_0p90, MC_ROLLRATE_P: 0.0594, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00126, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p10_d_1p00, MC_ROLLRATE_P: 0.0594, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00140, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p10_d_1p10, MC_ROLLRATE_P: 0.0594, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00154, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p10_d_1p20, MC_ROLLRATE_P: 0.0594, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00168, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p20_d_0p80, MC_ROLLRATE_P: 0.0648, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00112, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p20_d_0p90, MC_ROLLRATE_P: 0.0648, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00126, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p20_d_1p00, MC_ROLLRATE_P: 0.0648, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00140, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p20_d_1p10, MC_ROLLRATE_P: 0.0648, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00154, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
+  - {id: p_1p20_d_1p20, MC_ROLLRATE_P: 0.0648, MC_ROLLRATE_I: 0.0, MC_ROLLRATE_D: 0.00168, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 1.0}
 
 altitude_control:  # 脉冲期间：悬停推力 × (1 + 垂直反馈加速度/g) / cos(倾角)
   kp: 2.0  # 高度误差到加速度，1/s²
@@ -46,4 +67,4 @@ excitation:  # 每组 low/high：回中→正→回中→负→回中→负→�
   settle_s: 0.3  # 回中条件连续满足此时间后开始下一个脉冲，s
   pulse_duration_s: 0.25  # 每个正负角速度脉冲时长；s；须为有限正数
   levels_deg_s: [60, 120]  # low/high 两档幅值；deg/s；均 > 0 且 high ≥ low
-  repetitions: 2  # 完整激励计划的重复次数；整数，须 ≥ 1
+  repetitions: 1  # 完整激励计划的重复次数；整数，须 ≥ 1

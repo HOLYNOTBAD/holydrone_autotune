@@ -334,7 +334,7 @@ class Autotune {
    */
   void publish(double frd_rate = 0) {
     // 没有可信的交接推力时不提供 Offboard 指令流，避免以旧值或零推力接管。
-    if (!thrustReady()) {
+    if (!thrustReady(1.5)) {
       ROS_INFO_THROTTLE(5.0, "Pre-Offboard thrust: %s", thrustWaitReason().c_str());
       return;
     }
@@ -382,13 +382,13 @@ class Autotune {
   /** @brief FCU 必须已连接、处于 Offboard，且状态消息未超过 2 s。 */
   bool inOffboard() const { return offboard_ && steady()-state_received_ < state_timeout_; }
 
-  bool freshThrust() const {
-    return thrust_received_ > 0 && steady()-thrust_received_ <= thrust_timeout_;
+  bool freshThrust(double max_age = .5) const {
+    return thrust_received_ > 0 && steady()-thrust_received_ <= max_age;
   }
 
-  bool thrustReady() const {
+  bool thrustReady(double max_age = .5) const {
     return inOffboard() ? thrust_locked_ :
-      (!offboard_ && position_armed_ && steady()-state_received_ < state_timeout_ && freshThrust() && feedbackFresh());
+      (!offboard_ && position_armed_ && steady()-state_received_ < state_timeout_ && freshThrust(max_age) && feedbackFresh());
   }
 
   bool feedbackFresh() const {
@@ -499,7 +499,8 @@ class Autotune {
     const bool state_fresh = steady()-state_received_ < state_timeout_;
     if (next && !offboard_) {
       safety_exit_ = false;
-      thrust_locked_ = position_armed_ && state_fresh && freshThrust() && feedbackFresh();
+      // 模式心跳可滞后 1 s；切入角速度 Offboard 后推力反馈已停止，交接与预发送共用 1.5 s 宽限。
+      thrust_locked_ = position_armed_ && state_fresh && freshThrust(1.5) && feedbackFresh();
       origin_locked_ = thrust_locked_;
       if (origin_locked_) {
         origin_ = position_now_; origin_yaw_ = yaw_;
@@ -540,6 +541,7 @@ class Autotune {
     if (entering && !sequence_done_) {
       if (!thrust_locked_ || !origin_locked_) {
         event("AUTO_RUN_REJECTED", "no fresh pre-entry hover thrust");
+        safetyExit("Offboard handover rejected; return to Position for fresh hover thrust");
       } else {
         sequence_active_ = true;
         sequence_restart_ = true;

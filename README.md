@@ -8,8 +8,7 @@ ROS 1 + MAVROS 的 PX4 角速度环候选参数试验包：**依次写入预设 
   → ROS 事件 + PX4 ULog → 时间对齐与分段 → 跟踪指标、汇总表和曲线
 ```
 
-核心实现：[在线状态机](src/brct_autotune_fsm.cpp)、[离线入口](scripts/autotune_analyze.py)、
-[指标计算](src/autotune_analysis.py)。一阶响应及物理参数辨识属于另一个包 `holydrone_identification`。
+核心实现：[在线状态机](src/brct_autotune_fsm.cpp)、[离线分析与指标计算](scripts/autotune_analyze.py)。一阶响应及物理参数辨识属于另一个包 `holydrone_identification`。
 
 ## 1. 候选参数与激励
 
@@ -202,15 +201,26 @@ OUTPUT="$PWD/src/holydrone_autotune/data/roll_p_new" \
 ./src/holydrone_autotune/_scripts/kill.sh
 ```
 
-**当前 ULog 自动下载入口缺失：** launch 虽保留 `download_ulog`，但
-`scripts/download_flight_ulog.py` 不存在；`MODE=real_flight` 的 Shell 分支会启用它，当前不可直接按此路径依赖自动下载。
-实飞可独立启动 MAVROS，再直接运行以下 launch，手动从 SD 卡或 QGroundControl 获取 ULog：
+实飞默认启用 `download_flight_ulog.py`。先在地面启动并等待
+`ULog preflight inventory ready`，飞行结束、落地且 disarm 后，节点对比起飞前日志目录，
+等待新增或增长的 ULog 大小稳定，再通过 MAVROS FTP 下载到
+`${OUTPUT}_px4/log/flight_001/.../*.ulg`。终端每秒显示百分比、已下载/总字节、KiB/s 和预计剩余秒数。
+看到 `ULog saved` 后再停止会话；启动时已存在的历史日志不会自动下载，地面试解锁不触发。
+重新解锁、失联或反馈过期会停止传输，未完成文件保留 `.ulg.part`，不会冒充完整日志。
+不要让其他程序同时使用同一 MAVROS FTP 会话。
+
+实机 UART0 的已确认配置是 `/dev/ttyS0:2000000`、system ID `2`；可用
+`MAVROS_FCU_URL`、`MAVROS_TGT_SYSTEM` 覆盖。脚本需在连接飞控 UART 的机载计算机上运行。
+独立启动 MAVROS 后，也可运行：
 
 ```bash
 roslaunch holydrone_autotune brct_autotune.launch \
   output:="$(rospack find holydrone_autotune)/data/roll_p_real_new" \
-  download_ulog:=false
+  download_ulog:=true
 ```
+
+2026-11-04 地面检查：机载编译和模拟下载测试通过，但实际 UART 参数读取及 FTP 请求
+无响应，尚未成功下载真实 ULog；不能据此判定实飞就绪。详见 [硬件检查](../../HARDWARE_CHECK.md)。
 
 可加 `config:=/绝对路径/candidates.yaml` 替换候选配置。调试服务如下；自动序列或退出请求进行中拒绝人工 load/run/next/baseline。
 
@@ -264,3 +274,5 @@ MODE=real_flight MAVROS_FCU_URL=/dev/ttyACM0:115200 MAVROS_TGT_SYSTEM=1 \
 默认 `MODE=simulation`，使用 `udp://:14540@127.0.0.1:14557`、system ID 1；`MODE=real_flight` 默认使用 `/dev/ttyTHS0:2000000`、system ID 2。两种模式均支持 `MAVROS_FCU_URL` 和 `MAVROS_TGT_SYSTEM` 覆盖。本脚本仅启动 MAVROS，不启动 PX4/Gazebo。连接、参数同步与读取默认总超时 120 秒，可传 `--timeout` 修改，`--output` 可修改保存路径。成功、失败或中断时均关闭本脚本启动的 MAVROS。
 
 如果已有 `/mavros` 节点，Shell 拒绝重复启动；可在加载 ROS 环境后直接运行 `scripts/autotune_getPID.py` 使用现有 MAVROS，该方式不会关闭现有节点。
+
+离线分析脚本优先使用已有 Conda 环境；也支持 `PYTHON=/usr/bin/python3`，无 Conda 时回退到系统 Python（需安装 numpy、PyYAML、pyulog、matplotlib）。

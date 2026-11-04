@@ -6,9 +6,9 @@ set -e
 
 ####################### 参数区 #######################
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-MODE="${MODE:-simulation}"  # simulation | real_flight
+MODE="${MODE:-real_flight}"  # simulation | real_flight
 SIM_FCU_URL="udp://:14540@127.0.0.1:14557"
-REAL_FCU_URL="/dev/ttyTHS0:2000000"
+REAL_FCU_URL="/dev/ttyS0:2000000"
 OUTPUT="${OUTPUT:-$ROOT/config/brct_PID.yaml}"
 TIMEOUT="${TIMEOUT:-120}"
 

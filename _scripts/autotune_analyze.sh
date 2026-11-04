@@ -5,7 +5,8 @@ set -euo pipefail
 
 ####################### 参数区 #######################
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-SESSION="${SESSION:-$ROOT/data/lite_roll_pd_02_flight09}"
+SESSION="${SESSION:-$ROOT/data/lite_roll_pd_01_20261104_154111}"  # 可指定会话目录；
+PYTHON="${PYTHON:-}"  # 可指定解释器；未安装 Conda 时使用系统 python3
 CONDA_ENV="${CONDA_ENV:-holydrone_autotune}"
 CONDA_EXE="${CONDA_EXE:-$HOME/miniforge3/bin/conda}"
 # 留空则自动查找 <会话名>_px4 中唯一的 ULog，并使用 <会话名>_result。
@@ -18,14 +19,16 @@ ROS_MINUS_PX4_S="${ROS_MINUS_PX4_S:-}"
 ####################### 通用函数区 #######################
 
 ####################### 启动区 #######################
-if [[ ! -x "$CONDA_EXE" ]]; then
-  echo "Conda executable not found: $CONDA_EXE; set CONDA_EXE to its absolute path." >&2
-  exit 1
-fi
 ARGS=(--session "$SESSION")
 [[ -z "$ULOG" ]] || ARGS+=(--ulog "$ULOG")
 [[ -z "$OUTPUT" ]] || ARGS+=(--output "$OUTPUT")
 [[ -z "$ROS_MINUS_PX4_S" ]] || ARGS+=(--ros-minus-px4-s "$ROS_MINUS_PX4_S")
 # Conda 运行独立分析环境；Python 隔离模式避免继承 ROS 的 Python 搜索路径。
-exec env -u PYTHONPATH "$CONDA_EXE" run --no-capture-output -n "$CONDA_ENV" \
-  python -I "$ROOT/scripts/autotune_analyze.py" "${ARGS[@]}" "$@"
+if [[ -n "$PYTHON" ]]; then
+  RUN=("$PYTHON")
+elif [[ -x "$CONDA_EXE" ]]; then
+  RUN=("$CONDA_EXE" run --no-capture-output -n "$CONDA_ENV" python)
+else
+  RUN=(python3)
+fi
+exec env -u PYTHONPATH "${RUN[@]}" -I "$ROOT/scripts/autotune_analyze.py" "${ARGS[@]}" "$@"

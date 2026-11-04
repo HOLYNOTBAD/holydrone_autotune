@@ -27,7 +27,7 @@ class PipelineTest(unittest.TestCase):
             if each_pulse:
                 segments = [(.3, 0), (.25, 1), (.3, 0), (.25, -1), (.3, 0), (.25, -1), (.3, 0), (.25, 1), (.3, 0)]
             start = 1.
-            events = [dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1', event_type='TRIAL_START')]
+            events = [dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1', amplitude_deg_s=60, event_type='TRIAL_START')]
             sp = np.zeros(len(times))
             for phase, (duration, sign) in enumerate(segments):
                 events.append(dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1',
@@ -75,8 +75,11 @@ class PipelineTest(unittest.TestCase):
             report = json.loads((root/'report/report.json').read_text())
             self.assertEqual(len(report['pulses']), 4)
             self.assertEqual(len(report['summary']), 2)
-            self.assertTrue((root/'report/trial_001.png').exists())
-            self.assertAlmostEqual(report['pulses'][0]['allocator_unachieved_s'], .25, places=5)
+            self.assertTrue((root/'report/comparison_roll_60deg_s.png').exists())
+            self.assertTrue((root/'report/comparison_roll_60deg_s_zoom.png').exists())
+            self.assertTrue((root/'report/summary.csv').exists())
+            self.assertGreater(report['pulses'][0]['tracking_rmse'], 0)
+            self.assertLess(report['pulses'][0]['tracking_rmse'], np.deg2rad(60))
             # A materially wrong clock offset must be rejected, not silently analyzed.
             command[-1] = str(root/'wrong_report')
             result = subprocess.run(command+['--ros-minus-px4-s', str(offset+.3)],

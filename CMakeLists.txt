@@ -20,11 +20,6 @@ find_package(Boost REQUIRED COMPONENTS filesystem system)
 add_message_files(FILES ExperimentEvent.msg)
 # 注册带字符串参数的人工试验命令服务。
 add_service_files(FILES ExperimentCommand.srv)
-# 使用 setup.py 安装本包 Python 模块，供离线处理脚本导入。
-catkin_python_setup()
-# Noetic 的独立模块 relay 在隔离字典中执行，不能导出函数；开发空间直接复制源码。
-configure_file(src/autotune_analysis.py
-  ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}/autotune_analysis.py COPYONLY)
 # 生成已注册的消息和服务代码。
 generate_messages()
 
@@ -56,20 +51,14 @@ install(TARGETS brct_autotune_fsm
 # 分析程序属于本 ROS 包；Shell 入口负责选取 Conda 环境。
 catkin_install_python(PROGRAMS scripts/autotune_analyze.py scripts/autotune_getPID.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-# 包内 Shell 入口和离线模块保留相对布局，便于源码及安装空间调用。
+# 包内 Shell 入口和离线脚本保留相对布局，便于源码及安装空间调用。
 install(PROGRAMS _scripts/autotune_getPID.sh _scripts/autotune.sh _scripts/autotune_analyze.sh _scripts/kill.sh
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/_scripts)
 install(PROGRAMS scripts/autotune_getPID.py scripts/autotune_analyze.py scripts/autotune_session.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
-install(FILES src/autotune_analysis.py DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/src)
 install(FILES environment.yml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-# ULog 下载入口仍在迁移，存在时才安装。
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/download_flight_ulog.py")
-  catkin_install_python(PROGRAMS scripts/download_flight_ulog.py
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-else()
-  message(WARNING "Optional ULog downloader missing during directory migration")
-endif()
+catkin_install_python(PROGRAMS scripts/download_flight_ulog.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # 安装本行列出的公共头文件或运行资源，保留目录结构。
 install(DIRECTORY config launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

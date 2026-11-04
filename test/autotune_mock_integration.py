@@ -152,6 +152,29 @@ class MockFlight(unittest.TestCase):
                     launch = processes.pop()
                     os.killpg(launch.pid, signal.SIGINT); launch.wait(timeout=15)
 
+                # FCU stops thrust feedback before its delayed mode heartbeat arrives.
+                for delay in (.8, 1.7):
+                    launch_auto('handover_%s' % delay)
+                    wait_for(lambda: len(commands) > 5)
+                    feedback_thrust['enabled'] = False
+                    start = time.monotonic()
+                    time.sleep(delay)
+                    if delay < 1.5:
+                        self.assertLess(time.monotonic()-commands[-1][0], .2)
+                    else:
+                        self.assertGreater(time.monotonic()-commands[-1][0], .1)
+                    state.mode = 'OFFBOARD'
+                    if delay < 1.5:
+                        wait_for(lambda: any(e.event_type == 'TRIAL_START' for e in events))
+                        times = [t for t in stream_times if t >= start]
+                        self.assertLess(max(b-a for a, b in zip(times, times[1:])), .2)
+                        self.assertFalse(any(e.event_type == 'AUTO_RUN_REJECTED' for e in events))
+                    else:
+                        wait_for(lambda: 'POSCTL' in mode_requests)
+                        self.assertTrue(any(e.event_type == 'AUTO_RUN_REJECTED' for e in events))
+                        self.assertFalse(any(e.event_type == 'TRIAL_START' for e in events))
+                    close_auto()
+
                 launch_auto('auto_session')
                 self.assertFalse(load('unknown').success)
                 self.assertFalse(run('low').success)
