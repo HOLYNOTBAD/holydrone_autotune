@@ -1,0 +1,20 @@
+{
+  "kind": "autotune",
+  "complete": true,
+  "duration_s": 32.144000000000005,
+  "origin": [
+    -0.08685729652643204,
+    0.06039848551154137,
+    3.46929931640625
+  ],
+  "altitude_min_m": 3.410247802734375,
+  "altitude_max_m": 3.6226806640625,
+  "max_drop_m": 0.059051513671875,
+  "max_tilt_deg": 33.72812731914014,
+  "max_xy_distance_m": 8.88901541122701,
+  "modes_during_sequence": [
+    "OFFBOARD"
+  ],
+  "hold_verified_s": 3.0,
+  "pulses": 8
+}

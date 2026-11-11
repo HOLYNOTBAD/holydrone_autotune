@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--config', type=Path, help='candidate configuration to validate')
     parser.add_argument('--hover-only', action='store_true', help='validate airframe defaults for 20 seconds without loading candidates')
+    parser.add_argument('--expect-abort', action='store_true', help='verify recovery timeout retains OFFBOARD position hold')
     parser.add_argument('--quick', action='store_true', help='one repetition (and one autotune candidate)')
     args = parser.parse_args()
     root = args.output.resolve()
@@ -41,7 +42,7 @@ def main():
     from holydrone_autotune.msg import ExperimentEvent
     rp = rospkg.RosPack()
     package = 'holydrone_autotune'
-    source = args.config or Path(rp.get_path(package))/'config'/'brct_autotune.yaml'
+    source = args.config or Path(rp.get_path(package))/'config'/'brct_autotune_sim.yaml'
     cfg = yaml.safe_load(source.read_text())
     if args.quick:
         cfg['candidates'] = cfg['candidates'][:1]
@@ -50,6 +51,7 @@ def main():
     processes, samples, events = [], [], []
     state, pose = [None], [None]
     rates = []
+    modes = []
     hover_checks = {}
     log = (root/'console.log').open('w')
     stream = (root/'events.jsonl').open('w')
@@ -89,8 +91,13 @@ def main():
                'px4_dir:='+str(args.px4.resolve()), 'px4_runtime_dir:='+str(root/'px4'),
                'world:='+rp.get_path('holydrone')+'/gazebo/worlds/empty.world', 'spawn_z:=0.055'])
         wait(rosgraph.is_master_online, 20, 'master')
+        # Master can become reachable before roslaunch uploads /use_sim_time.
+        rospy.set_param('/use_sim_time', True)
         rospy.init_node('excitation_sitl_check', disable_signals=True)
-        subscriptions = [rospy.Subscriber('/mavros/state', State, lambda m: state.__setitem__(0, m)),
+        def onstate(msg):
+            state[0] = msg
+            modes.append([rospy.Time.now().to_sec(), msg.mode, msg.armed])
+        subscriptions = [rospy.Subscriber('/mavros/state', State, onstate),
                          rospy.Subscriber('/mavros/local_position/pose', PoseStamped, onpose),
                          rospy.Subscriber('/pid_experiment/event', ExperimentEvent, onevent),
                          rospy.Subscriber('/mavros/imu/data', Imu, lambda m: rates.append([m.header.stamp.to_sec(), m.angular_velocity.x, m.angular_velocity.y, m.angular_velocity.z]))]
@@ -139,6 +146,10 @@ def main():
         origin = pose[0].pose.position
         assert mode(0, 'OFFBOARD').mode_sent
         wait(finished, 600, 'excitation sequence')
+        wait(lambda: state[0].mode == 'OFFBOARD', 2, 'OFFBOARD hold')
+        hold_start = rospy.Time.now().to_sec()
+        time.sleep(3)
+        assert state[0].mode == 'OFFBOARD', 'completion/protection changed flight mode'
         end = pose[0].header.stamp.to_sec()
         flight = [s for s in samples if start <= s[0] <= end]
         complete = any(e.get('type') == 'SEQUENCE_COMPLETE' for e in events)
@@ -146,14 +157,45 @@ def main():
                       origin=[origin.x, origin.y, origin.z], altitude_min_m=min(s[3] for s in flight),
                       altitude_max_m=max(s[3] for s in flight), max_drop_m=origin.z-min(s[3] for s in flight),
                       max_tilt_deg=max(s[4] for s in flight), max_xy_distance_m=max(math.hypot(s[1]-origin.x,s[2]-origin.y) for s in flight))
+        relevant_modes = [m for t,m,a in modes if start+1 <= t <= end]
+        result['modes_during_sequence'] = sorted(set(relevant_modes))
+        assert relevant_modes and all(m == 'OFFBOARD' for m in relevant_modes), 'unexpected mode exit'
+        result['hold_verified_s'] = rospy.Time.now().to_sec()-hold_start
         result['pulses'] = sum(e.get('type') in ('PULSE_POSITIVE', 'PULSE_NEGATIVE') for e in events)
         (root/'result.json').write_text(json.dumps(result, indent=2)+'\n')
         (root/'pose_samples.json').write_text(json.dumps(flight))
         print(json.dumps(result, indent=2), flush=True)
-        assert complete, 'sequence aborted; see events.jsonl'
+        if args.expect_abort:
+            assert any(e['type'] == 'SAFETY_ABORT' and 'recenter timeout' in e['detail'] for e in events), 'expected recovery timeout'
+            assert not complete
+        else:
+            assert complete, 'sequence aborted; see events.jsonl'
         assert result['max_drop_m'] < .3, 'excessive drop'
         assert result['max_tilt_deg'] < 45, 'excessive tilt'
-        assert result['max_xy_distance_m'] < 2, 'excessive drift'
+        # Excitation displacement is allowed; verify every completed recovery instead.
+        journal = list(yaml.safe_load_all((root/'session/events.yaml').read_text()))
+        recovered = [e for e in journal if e['event_type'] == 'RECOVERY_FINISHED']
+        for e in recovered:
+            assert e['horizontal_error_m'] <= cfg['recovery']['horizontal_tolerance_m'], 'recovery outside XY tolerance'
+            assert abs(e['height_error_m']) <= cfg['recovery']['position_tolerance_m'], 'recovery outside height tolerance'
+            # 当前回中条件为位置和航向；速度阈值已从控制器移除。
+        for e in journal:
+            if e['event_type'] == 'PULSE_ZERO_RATE_FINISHED':
+                assert math.degrees(e['angular_speed_rad_s']) <= cfg['excitation'].get('zero_rate_tolerance_deg_s', 5), 'pulse resumed before rate settled'
+        if not args.expect_abort:
+            expected_pulses = len(cfg['candidates'])*2*2*cfg['excitation']['repetitions']
+            assert result['pulses'] == expected_pulses, 'missing excitation pulses'
+            assert len(recovered) >= len(cfg['candidates'])*2*(cfg['excitation']['repetitions']+1), 'missing group recoveries'
+            groups = []
+            group = []
+            for e in journal:
+                if e['event_type'] in ('PULSE_POSITIVE', 'PULSE_NEGATIVE'):
+                    group.append(e['event_type'])
+                elif e['event_type'] in ('RATE_HANDOVER_START', 'POSITION_CONTROL_RESUMED', 'RECOVERY_START'):
+                    if group:
+                        assert group == ['PULSE_POSITIVE','PULSE_NEGATIVE'], 'interrupted two-pulse group'
+                        groups.append(group); group = []
+            assert len(groups)*2 == expected_pulses, 'missing complete groups'
     finally:
         if 'mode' in locals():
             try:

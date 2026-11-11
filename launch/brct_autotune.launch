@@ -1,7 +1,7 @@
 <!-- 启动 holydrone_autotune 的 brct_autotune；参数按 arg 显式传递，节点参数位于各自私有空间。 -->
 <launch>
   <!-- 激励或候选 YAML 路径；传给被包含 launch 或节点配置 -->
-  <arg name="config" default="$(find holydrone_autotune)/config/brct_autotune.yaml"/>
+  <arg name="config" default="$(find holydrone_autotune)/config/brct_autotune_roll.yaml"/>
   <!-- Required unique directory; the FSM creates it and archives the YAML. -->
   <!-- 必填的新会话输出目录；避免复用已存在记录 -->
   <arg name="output"/>

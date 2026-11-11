@@ -119,8 +119,8 @@ def write_summary_tables(pulses, path):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--session', required=True, help='directory containing events.yaml and timesync.csv')
-    p.add_argument('--ulog', type=Path, help='ULog path; default: unique *.ulg under <session>_px4')
+    p.add_argument('--session', help='session directory; default: latest events.yaml under package data/')
+    p.add_argument('--ulog', type=Path, help='ULog override; default: unique *.ulg in the session directory')
     p.add_argument('--output', type=Path, help='new output directory; default: <session>_result')
     p.add_argument('--ros-minus-px4-s', type=float, help='explicit measured clock offset; overrides TIMESYNC')
     p.add_argument('--hf-hz', type=float, default=30)
@@ -129,6 +129,12 @@ def main():
         p.error('--hf-hz must be positive')
     if args.ros_minus_px4_s is not None and not np.isfinite(args.ros_minus_px4_s):
         p.error('--ros-minus-px4-s must be finite')
+    if args.session is None:
+        sessions = [f.parent for f in (PACKAGE / 'data').glob('*/events.yaml')
+                    if not f.parent.name.endswith(('_px4', '_result'))]
+        if not sessions:
+            p.error('no session with events.yaml under ' + str(PACKAGE / 'data'))
+        args.session = str(max(sessions, key=lambda s: ((s/'events.yaml').stat().st_mtime_ns, s.name)))
     session = Path(args.session).expanduser()
     if not session.is_dir() and len(session.parts) == 1:
         session = PACKAGE / 'data' / session
@@ -139,10 +145,11 @@ def main():
     if destination.exists():
         p.error('output already exists; use a new --output directory: ' + str(destination))
     if args.ulog is None:
-        files = sorted(session.with_name(session.name+'_px4').rglob('*.ulg'))
+        files = sorted(f for f in session.iterdir() if f.is_file() and f.suffix.lower() == '.ulg')
         if len(files) != 1:
-            p.error('expected one ULog under <session>_px4; found %d; specify --ulog explicitly%s' %
-                    (len(files), ''.join('\n  '+str(path) for path in files)))
+            p.error('expected exactly one ULog in %s; found %d; manually copy the matching .ulg '
+                    'into this session directory and keep only one%s' %
+                    (session, len(files), ''.join('\n  '+str(path) for path in files)))
         args.ulog = files[0]
     args.ulog = args.ulog.expanduser().resolve()
     if not args.ulog.is_file() or args.ulog.suffix.lower() != '.ulg':

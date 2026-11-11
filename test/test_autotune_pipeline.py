@@ -18,7 +18,10 @@ class PipelineTest(unittest.TestCase):
     def test_recovery_after_each_pulse(self):
         self.run_report(True)
 
-    def run_report(self, each_pulse):
+    def test_contiguous_four_pulse_group(self):
+        self.run_report(True, grouped=True)
+
+    def run_report(self, each_pulse, grouped=False):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             times = np.arange(0, 6, .005)
@@ -26,6 +29,8 @@ class PipelineTest(unittest.TestCase):
             segments = [(.75, 0), (.25, 1), (.25, -1), (.75, 0), (.25, -1), (.25, 1), (1., 0)]
             if each_pulse:
                 segments = [(.3, 0), (.25, 1), (.3, 0), (.25, -1), (.3, 0), (.25, -1), (.3, 0), (.25, 1), (.3, 0)]
+            if grouped:
+                segments = [(.3, 0), (.25, 1), (.25, -1), (.25, -1), (.25, 1), (.3, 0)]
             start = 1.
             events = [dict(timestamp=offset+start, trial_id=1, axis='roll', candidate_id='p1', amplitude_deg_s=60, event_type='TRIAL_START')]
             sp = np.zeros(len(times))
@@ -68,7 +73,7 @@ class PipelineTest(unittest.TestCase):
                         # 同一PX4时刻可以发布两次状态更新，不应把它当成时钟倒退。
                         record('D', struct.pack('<HQfff', mid, int(round(times[-1]*1e6)), 0, 0, 0))
             script = Path(__file__).resolve().parents[1]/'scripts/autotune_analyze.py'
-            command = [sys.executable, str(script), '--session', str(root), '--ulog', str(root/'flight.ulg'),
+            command = [sys.executable, str(script), '--session', str(root),
                        '--output', str(root/'report')]
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)

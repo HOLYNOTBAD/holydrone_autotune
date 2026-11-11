@@ -1,0 +1,53 @@
+{
+  "normal": {
+    "kind": "autotune",
+    "complete": true,
+    "duration_s": 86.59200000000001,
+    "origin": [
+      -0.0848151370882988,
+      0.04470571130514145,
+      3.49176025390625
+    ],
+    "altitude_min_m": 3.448577880859375,
+    "altitude_max_m": 3.6478271484375,
+    "max_drop_m": 0.043182373046875,
+    "max_tilt_deg": 32.127999645041136,
+    "max_xy_distance_m": 2.337134510721955,
+    "modes_during_sequence": [
+      "OFFBOARD"
+    ],
+    "hold_verified_s": 3.0,
+    "pulses": 16,
+    "ulog_offboard_verified": true,
+    "ulog_rate_control_verified": true,
+    "recovery_checks": 23,
+    "recovery_xy_max_m": 0.708468906667633,
+    "final_recovery_xy_m": 0.3122321205662892,
+    "final_recovery_height_error_m": -0.001068115234375
+  },
+  "timeout": {
+    "kind": "autotune",
+    "complete": false,
+    "duration_s": 5.168000000000006,
+    "origin": [
+      -0.09565797448158264,
+      0.043557483702898026,
+      3.490478515625
+    ],
+    "altitude_min_m": 3.469451904296875,
+    "altitude_max_m": 3.490478515625,
+    "max_drop_m": 0.021026611328125,
+    "max_tilt_deg": 0.3694359933179081,
+    "max_xy_distance_m": 0.0774246917378773,
+    "modes_during_sequence": [
+      "OFFBOARD"
+    ],
+    "hold_verified_s": 3.0,
+    "pulses": 0
+  },
+  "cpp_unit_tests": 7,
+  "python_unit_tests": 21,
+  "mock_integration": "passed",
+  "scope": "Gazebo Classic holydrone_lite, two candidates, low/high 60/120 deg/s, 0.25 s pulses; not a full 25-candidate or real-flight validation",
+  "normal_verification": "ULog replay verifies every pulse uses rate control and entire sequence retains OFFBOARD; all recovery events satisfy configured position/height/speed thresholds. Repeated successful settling checks before a rejected handover are allowed."
+}

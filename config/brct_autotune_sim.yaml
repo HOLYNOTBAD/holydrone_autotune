@@ -4,8 +4,8 @@
 # 候选写入会改变飞控 PID；异步写入并读回确认后自动开始激励。
 experiment_id: lite_roll_pd_01  # 写入事件及离线报告的非空会话标识
 axis: roll  # FRD 激励轴；可选 roll、pitch、yaw
-# 推力由已解锁 POSCTL 下的 target_attitude.thrust 实时采集；每次进入 Offboard 时锁定。
-# 切换前先稳定悬停，并等待终端提示推力已就绪；不使用固定推力回退。
+# 每个双脉冲组前从稳定 OFFBOARD 位置控制阶段采集推力窗口均值。
+# 回中由 PX4 位置控制完成；位置与角速度指令互斥发送，不使用固定推力回退。
 # pd fixes K and requires I=FF=0; use manual for later I/FF experiments.
 search_stage: pd  # 候选检查模式；pd 要求 I=FF=0，manual 允许非零；两者均固定 K
 baseline:  # 人工恢复使用的 P/I/D/FF/K；不会自动恢复
@@ -49,22 +49,17 @@ altitude_control:  # 脉冲期间：悬停推力 × (1 + 垂直反馈加速度/g
   integral_limit: 1.0  # 积分项加速度限幅，m/s²
   min_thrust: 0.05
   max_thrust: 0.8
-recovery:  # 每个脉冲后闭环回中；不等待精确返回原始 XY
+recovery:  # 每个独立脉冲后由 PX4 位置控制回中；不等待精确返回原始 XY
+  horizontal_speed_tolerance_m_s: 0.3  # 每次脉冲前必须完成水平制动
+  tilt_tolerance_deg: 5.0  # 每次脉冲前必须接近水平
+  angular_speed_tolerance_deg_s: 5.0  # 三轴角速度合量
   timeout_s: 8.0
-  position_tolerance_m: 0.15  # 高度容差（沿用原参数名）
+  position_tolerance_m: 0.5  # 高度容差（沿用原参数名）
   horizontal_tolerance_m: 0.75  # 回中后允许的 XY 偏移；不要求精确回原点
-  speed_tolerance_m_s: 0.3
-  tilt_tolerance_deg: 5.0
   yaw_tolerance_deg: 5.0
-  angular_speed_tolerance_rad_s: 0.2  # 三轴实测角速度向量模长，约 11.5 deg/s
   angular_feedback_timeout_s: 0.1  # 按采样/ROS时钟判断IMU新鲜度；另检查墙钟接收间隔
-  position_gain: 0.8  # 缓慢拉回原始 XY，1/s²
-  velocity_gain: 1.8  # 水平速度阻尼，1/s
-  attitude_gain: 4.0
-  max_tilt_deg: 12.0  # 回中时最大目标倾角
-  max_rate_rad_s: 2.0
-excitation:  # 每组 low/high：回中→正→回中→负→回中→负→回中→正→回中，再重复
-  settle_s: 0.3  # 回中条件连续满足此时间后开始下一个脉冲，s
+excitation:  # 每档 low/high：回中稳定→+→位置制动回中→−→位置制动回中；按 repetitions 重复双脉冲组
+  settle_s: 0.3  # 回中条件连续满足此时间后开始下一脉冲，s
   pulse_duration_s: 0.25  # 每个正负角速度脉冲时长；s；须为有限正数
   levels_deg_s: [60, 120]  # low/high 两档幅值；deg/s；均 > 0 且 high ≥ low
   repetitions: 1  # 完整激励计划的重复次数；整数，须 ≥ 1

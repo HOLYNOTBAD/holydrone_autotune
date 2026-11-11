@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   mavros_msgs
+  mavlink
   message_generation
   roscpp
   std_msgs
@@ -33,6 +34,9 @@ include_directories(include ${EIGEN3_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Boos
 
 # 构建候选参数写入、确认与激励状态机。
 add_executable(brct_autotune_fsm src/brct_autotune_fsm.cpp)
+# 显式依赖，避免旧构建目录漏掉新增头文件后继续使用旧二进制。
+set_property(SOURCE src/brct_autotune_fsm.cpp APPEND PROPERTY OBJECT_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/holydrone_autotune/parameter_link.hpp)
 target_compile_features(brct_autotune_fsm PRIVATE cxx_std_14)
 # 确保本包及 Catkin 依赖的消息/服务代码先生成，再编译节点。
 add_dependencies(brct_autotune_fsm
@@ -52,8 +56,9 @@ install(TARGETS brct_autotune_fsm
 catkin_install_python(PROGRAMS scripts/autotune_analyze.py scripts/autotune_getPID.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 # 包内 Shell 入口和离线脚本保留相对布局，便于源码及安装空间调用。
-install(PROGRAMS _scripts/autotune_getPID.sh _scripts/autotune.sh _scripts/autotune_analyze.sh _scripts/kill.sh
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/_scripts)
+install(DIRECTORY _scripts/simulation _scripts/real_flight
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/_scripts
+  USE_SOURCE_PERMISSIONS)
 install(PROGRAMS scripts/autotune_getPID.py scripts/autotune_analyze.py scripts/autotune_session.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
 install(FILES environment.yml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
@@ -69,6 +74,9 @@ install(FILES README.md DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 # ============================ 测试注册 ============================
 if(CATKIN_ENABLE_TESTING)
+  add_executable(parameter_link_probe EXCLUDE_FROM_ALL test/parameter_link_probe.cpp)
+  target_compile_features(parameter_link_probe PRIVATE cxx_std_14)
+  target_link_libraries(parameter_link_probe ${catkin_LIBRARIES})
   catkin_add_gtest(test_brct_trial test/test_brct_trial.cpp)
   if(TARGET test_brct_trial)
     target_compile_features(test_brct_trial PRIVATE cxx_std_14)

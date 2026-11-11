@@ -14,7 +14,7 @@ ROS 1 + MAVROS 的 PX4 角速度环候选参数试验包：**依次写入预设 
 
 ### 试验哪些参数
 
-当前 [brct_autotune.yaml](config/brct_autotune.yaml) 针对 **holydrone_lite / airframe 22001 仿真**，对 FRD roll 轴做 P 粗搜索：
+当前 [brct_autotune_sim.yaml](config/brct_autotune_sim.yaml) 针对 **holydrone_lite / airframe 22001 仿真**，对 FRD roll 轴做 P/D 粗搜索：
 
 | 候选 | P | I | D | FF | K |
 | --- | --- | --- | --- | --- | --- |
@@ -28,14 +28,19 @@ ROS 1 + MAVROS 的 PX4 角速度环候选参数试验包：**依次写入预设 
 `search_stage: pd` 要求 I=FF=0，K 固定为 baseline K；`manual` 允许非零 I/FF，但仍固定 K。
 `baseline` 是人工填写的恢复值，不是启动时自动备份的飞控参数。
 
-连接后预加载第一候选。每次写入先强制同步参数表，确认参数存在，写入后等待 1.8 s，
-再强制刷新并读回，满足下式才视为成功：
+连接后预加载第一候选。通过 MAVROS 的 `/mavlink/to`、`/mavlink/from` 定向读取该轴 P/I/D/FF/K，
+只写变化项，逐项等待飞控 `PARAM_VALUE` 确认，再定向读取全部五项复核。
+不调用全量参数拉取或用缓存确认成功；每项请求等待 1 s、最多尝试 3 次。
+检查回复来源、参数名称、REAL32 类型及有限数值，拒绝请求前的带时间戳回复。
+目标 IDs 使用 MAVROS 的 `target_system_id` / `target_component_id`，多实例可 remap 原始 MAVLink 话题。满足下式才视为成功：
 
 $$
 |p_{\mathrm{read}}-p_{\mathrm{target}}|\le 10^{-7}+10^{-5}|p_{\mathrm{target}}|
 $$
 
-事务在后台运行，避免阻塞 200 Hz 指令发布。部分写入后失败会保留已生效参数，停止后续激励，不自动回滚。
+事务在后台运行，参数回复由独立回调队列和线程处理，避免与 200 Hz 控制、IMU 和日志回调争用。
+超时会记录目标 ID、MAVROS 订阅者数、原始接收数、参数回复数及拒绝原因（来源、长度/帧、名称、旧时间戳），帮助区分链路无回复和本地过滤。
+部分写入后失败会保留已生效参数，停止后续激励，不自动回滚。
 
 ### 使用什么激励
 
@@ -43,12 +48,12 @@ $$
 每档开始先回中，每次 repetition 执行：
 
 ```text
-+A 0.25 s → 回中 → −A 0.25 s → 回中 → −A 0.25 s → 回中 → +A 0.25 s → 回中
++A → PX4 位置制动、回中稳定 → −A → PX4 位置制动、回中稳定
 ```
 
-每档重复 2 次，即 8 个脉冲；默认 3 个候选共 6 个 trial、48 个脉冲，纯脉冲时间为 12 s。
-实际总时长还包含参数事务与反馈决定的回中时间，不能固定为 12 s。
-脉冲期间只给所选轴非零角速度指令；每个脉冲停止后均闭环回中，实测稳定后才开始下一个脉冲。
+每个脉冲默认持续 0.25 s，每个 repetition 是两个独立脉冲；重复数由 `excitation.repetitions` 决定。
+N 个候选、两档幅值、R 次重复共 4NR 个脉冲，实际总时长还包括参数事务、组间交接和回中。
+脉冲期间只给所选轴非零角速度指令。roll、pitch、yaw 共用同一流程：每个脉冲后发送 0.1 s 零角速度缓冲，再切入 PX4 位置控制，主动消除水平速度并回中；不再使用只恢复水平姿态的独立等待分支。满足下方稳定条件后，才允许下一脉冲。
 
 配置、事件和离线报告使用 FRD（前、右、下）；MAVROS 发布使用 FLU（前、左、上），pitch/yaw 发布前取反。
 指令通过 `/mavros/setpoint_raw/attitude` 发送，归一化推力为正标量。应使用
@@ -58,11 +63,12 @@ $$
 
 ### 推力基准和定高
 
-在已解锁 POSCTL 稳定悬停时，从 `/mavros/setpoint_raw/target_attitude.thrust` 获取飞控回传推力；
-进入 OFFBOARD 时锁定为本航次基准 $T_h$，同时记录 ENU 位置和航向。
-不从 `MPC_THR_HOVER` 或固定配置值回退；推力、位姿、速度反馈必须新鲜。
+进入 OFFBOARD 时记录 ENU 位置和航向，先发送位置目标让 PX4 闭环悬停。
+每个脉冲前，只在回中条件满足时采集 `/mavros/setpoint_raw/target_attitude.thrust`：
+位置阶段开始后隔离 0.65 s，取最近 0.5 s 中至少 3 个、覆盖至少 0.2 s 的新鲜样本平均值作为该脉冲的 $T_h$。
+样本间断或运动条件不满足会清空窗口；每个脉冲前重新采集并重置高度积分，不用固定值回退。
 
-[定高控制](include/holydrone_autotune/altitude_control.hpp) 全程工作。设高度误差 $e_z=z_0-z$、向上速度 $v_z$，其核心关系为：
+[定高控制](include/holydrone_autotune/altitude_control.hpp) 仅在角速度脉冲期间工作，位置阶段高度由 PX4 控制。设高度误差 $e_z=z_0-z$、向上速度 $v_z$，其核心关系为：
 
 $$
 a_z=\operatorname{clip}(k_p e_z-k_d v_z+I_z,\,-a_{\max},a_{\max}),\qquad
@@ -75,33 +81,29 @@ $\theta$ 表示机体倾角，$g=9.80665$ m/s²。积分项 $I_z$ 对高度误�
 
 ### 回中控制
 
-[回中控制](include/holydrone_autotune/recenter_control.hpp) 先根据水平位置误差和速度生成目标水平加速度：
-
-$$
-\mathbf a_{xy}=k_{pos}(\mathbf p_{0,xy}-\mathbf p_{xy})-k_{vel}\mathbf v_{xy}
-$$
-
-再将其转换为目标倾角，保持初始航向，用当前姿态到目标姿态的四元数误差生成机体角速度指令。
-当前水平增益为 0.8、1.8，目标倾角上限 12°，角速度向量模长上限 2 rad/s。
-回中阶段仍用角速度/推力接口；其角速度指令通常不为零，不能当作零输入响应分析。
+回中、参数加载、正常完成和中止后的保持阶段都向 `/mavros/setpoint_raw/local` 发送 XYZ 位置和航向，使用 PX4 内部位置、速度、姿态和角速度控制器。
+脉冲期间只向 `/mavros/setpoint_raw/attitude` 发送角速度与推力。两个接口由同一个定时流程互斥发布，全程保持 OFFBOARD，不调用切模式服务。
+切入角速度控制后先发送 0.65 s 零角速度，再用新的 IMU 反馈累计完整稳定窗口；交接期间任一稳定条件失效，立即退回位置控制，不继续激励。每个脉冲后的回中记录 `RECOVERY_START/FINISHED`，交接失败记录 `RATE_HANDOVER_REJECTED`。交接和重试均计入 `recovery.timeout_s`，不会无限延长等待。
+回中目标始终是本次进入 OFFBOARD 时的位置；回中仍使用当前候选的角速度 PID。原自写回中增益不再使用。
 
 只有下列条件在连续新鲜 IMU 样本中满足 0.3 s 才开始下一个脉冲（包括第一脉冲）：
 
 | 回中条件 | 当前阈值 |
 | --- | --- |
-| 高度误差 / 水平偏移 | ≤ 0.15 m / ≤ 0.75 m |
-| 三维速度模长 | ≤ 0.3 m/s |
-| 倾角 / 航向误差 | ≤ 5° / ≤ 5° |
-| 实测三轴角速度模长 | ≤ 0.2 rad/s（约 11.5°/s） |
+| 高度误差 / 水平偏移 | ≤ 0.5 m / ≤ 0.75 m |
+| 航向误差 | ≤ 5° |
+| 水平速度合量 | ≤ 0.3 m/s |
+| 机体倾角 | ≤ 5° |
+| 三轴角速度合量 | ≤ 5°/s |
 
-角速度来自 `/mavros/imu/data`，不使用设定值代替实测值。未满足回中条件、重复时间戳或采样间断会重置稳定计时。陈旧反馈不用于推进回中，反馈失效时暂停控制指令发布；不因该检查主动请求 POSCTL。PX4 自身的 Offboard 失联行为仍由飞控配置决定。
+上述运动门槛用于激励放行，避免经过原点但仍倾斜或移动时开始下一脉冲；它们不是脉冲期间的自动退出阈值。IMU、位置和速度反馈的新鲜度检查仍保留。未满足回中条件、重复时间戳或采样间断会重置稳定计时。陈旧反馈不用于推进回中，反馈失效时暂停控制指令发布；不因该检查主动请求 POSCTL。PX4 自身的 Offboard 失联行为仍由飞控配置决定。
 
-不设置倾角、高度偏差、空间偏移、垂直速度的自动退出阈值，由操作者手动接管。手动退出 Offboard 后中止试验。回中超过 `recovery.timeout_s`（默认 8 s）或脉冲调度超时仍中止并请求 POSCTL；FCU 状态超过 2 s 未更新也会中止试验。
+不设置倾角、高度偏差、空间偏移、垂直速度的自动退出阈值，由操作者手动接管。手动退出 Offboard 后中止试验。回中超过 `recovery.timeout_s`（默认 8 s）或脉冲调度超时会中止激励并保持 OFFBOARD 位置控制；FCU 状态超过 2 s 未更新也会中止试验。
 
 ### 自动序列的边界
 
 人工进入 OFFBOARD 后固定自动遍历全部候选 low → high，无需额外开关；
-最后一档也完成回中后，才请求 POSCTL，并以飞控模式回传确认序列完成。
+最后一档完成回中后记录 `SEQUENCE_COMPLETE`，继续保持 OFFBOARD 位置控制，等待操作者接管。
 中止后重新满足条件并进入 OFFBOARD，会从首组 low 重启；完整完成后需新节点会话才能再次自动遍历。
 
 **退出 OFFBOARD、关闭节点或试验完成都不会恢复原 PID，最后生效的候选仍留在飞控中。**
@@ -189,16 +191,18 @@ cd deployment
 source /opt/ros/noetic/setup.bash
 catkin_make
 source devel/setup.bash
-OUTPUT="$PWD/src/holydrone_autotune/data/roll_p_new" \
-  ./src/holydrone_autotune/_scripts/autotune.sh
+# 先编辑对应脚本参数区的 CONFIG、OUTPUT 等设置。
+./src/holydrone_autotune/_scripts/simulation/autotune.sh
 ```
 
-该 Shell 入口需要 GNOME Terminal，默认启动 SITL/MAVROS 与试验节点，不自动解锁或起飞。
-人工在 POSCTL 起飞并稳定悬停，等待候选 READY、推力及反馈就绪，再进入 OFFBOARD。
-完整序列结束后确认 POSCTL，人工降落；需要时恢复 baseline。停止本包会话使用：
+Shell 入口直接启动任务，记录 PID 后返回，不需要 GNOME Terminal 或 Python 会话管理器。
+仿真启动 SITL/MAVROS 与试验节点，实飞启动 MAVROS 与试验节点；不自动解锁或起飞。
+同目录 kill.sh 读取记录、向进程组发送 SIGTERM 并删除 PID 文件；仿真、实飞记录彼此独立。
+人工在 POSCTL 起飞并稳定悬停，等待候选 READY、运动反馈就绪，再进入 OFFBOARD；脉冲推力在 OFFBOARD 位置阶段采集。
+完整序列结束后仍保持 OFFBOARD；操作者确认油门杆位置后接管并人工降落；需要时恢复 baseline。停止本包会话使用：
 
 ```bash
-./src/holydrone_autotune/_scripts/kill.sh
+./src/holydrone_autotune/_scripts/real_flight/kill.sh
 ```
 
 实飞默认启用 `download_flight_ulog.py`。先在地面启动并等待
@@ -210,7 +214,7 @@ OUTPUT="$PWD/src/holydrone_autotune/data/roll_p_new" \
 不要让其他程序同时使用同一 MAVROS FTP 会话。
 
 实机 UART0 的已确认配置是 `/dev/ttyS0:2000000`、system ID `2`；可用
-`MAVROS_FCU_URL`、`MAVROS_TGT_SYSTEM` 覆盖。脚本需在连接飞控 UART 的机载计算机上运行。
+脚本参数区的 `FCU_URL`、`TARGET_SYSTEM` 修改。脚本需在连接飞控 UART 的机载计算机上运行。
 独立启动 MAVROS 后，也可运行：
 
 ```bash
@@ -238,14 +242,14 @@ rosservice call /next_candidate
 
 ```bash
 conda env create -f deployment/src/holydrone_autotune/environment.yml
-bash deployment/src/holydrone_autotune/_scripts/autotune_analyze.sh \
-  --session roll_p_new
+bash deployment/src/holydrone_autotune/_scripts/real_flight/autotune_analyze.sh
 ```
 
-会话简称在包内 `data/` 查找；默认选择 `<会话名>_px4` 中唯一 `.ulg`，输出到 `<会话名>_result`。
-多个 ULog 时用 `--ulog /路径/flight.ulg` 指定；用 `--output /全新结果目录` 指定其他输出。
+仿真和实飞统一手动将同次飞行的唯一 `.ulg` 复制到 `data/<会话名>/` 根目录，与 `events.yaml`、`timesync.csv` 放在一起。
+先在分析脚本参数区填写实际 `SESSION` 和 `OUTPUT`，再零参数运行；脚本直接调用 Conda 中的分析程序。
+分析程序要求会话目录中有唯一 ULog。需要覆盖日志或时钟偏移时，在脚本参数区的 `EXTRA_ARGS` 填写相应 Python 参数；Python 命令行接口保持不变。
 默认会自动检查 TIMESYNC；仅已通过全部脉冲校验的 PX4_SITL 日志可采用共享时钟回退。只有确认时钟偏移后才传 `--ros-minus-px4-s`，不要照搬其他航次的零偏移。
-Shell 支持 `CONDA_EXE`、`CONDA_ENV` 等环境变量覆盖，命令行分析参数优先。
+Shell 不读取额外环境覆盖或命令行选项，Conda 环境在参数区的 `CONDA_ENV` 设置。
 采集会话和分析输出均拒绝覆盖已有目录；分析全部成功后才生成最终结果目录。
 
 本地测试入口为 `catkin_make run_tests_holydrone_autotune`，
@@ -260,19 +264,28 @@ Shell 支持 `CONDA_EXE`、`CONDA_ENV` 等环境变量覆盖，命令行分析�
 
 ### 读取飞控当前 PID
 
-`_scripts/autotune_getPID.sh` 自动启动 MAVROS，等待飞控连接，强制刷新参数表后读取所选轴的 P/I/D/FF/K。默认 roll，结果保存至 `config/brct_PID.yaml` 的 `baseline` 映射；全部读取成功才替换已有文件。此文件不会自动修改试验配置，也不会向飞控写参数。
+`_scripts/real_flight/autotune_getPID.sh` 自动启动 MAVROS，等待飞控连接，强制刷新参数表后读取所选轴的 P/I/D/FF/K。默认 roll，结果保存至 `config/brct_PID.yaml` 的 `baseline` 映射；全部读取成功才替换已有文件。此文件不会自动修改试验配置，也不会向飞控写参数。
 
 ```bash
 # 仿真：先启动 PX4 SITL，本脚本通过 UDP 启动 MAVROS 并读取。
-MODE=simulation bash deployment/src/holydrone_autotune/_scripts/autotune_getPID.sh
+bash deployment/src/holydrone_autotune/_scripts/simulation/autotune_getPID.sh
 # 实机：按实际串口和 system ID 修改。
-MODE=real_flight MAVROS_FCU_URL=/dev/ttyACM0:115200 MAVROS_TGT_SYSTEM=1 \
-  bash deployment/src/holydrone_autotune/_scripts/autotune_getPID.sh
-# 可追加 --axis pitch 或 --axis yaw；每次只保存所选轴，替换同一输出文件。
+# 在脚本参数区填写 FCU_URL、TARGET_SYSTEM。
+bash deployment/src/holydrone_autotune/_scripts/real_flight/autotune_getPID.sh
+# 在参数区修改 AXIS 选择 pitch 或 yaw；每次只保存所选轴。
 ```
 
-默认 `MODE=simulation`，使用 `udp://:14540@127.0.0.1:14557`、system ID 1；`MODE=real_flight` 默认使用 `/dev/ttyTHS0:2000000`、system ID 2。两种模式均支持 `MAVROS_FCU_URL` 和 `MAVROS_TGT_SYSTEM` 覆盖。本脚本仅启动 MAVROS，不启动 PX4/Gazebo。连接、参数同步与读取默认总超时 120 秒，可传 `--timeout` 修改，`--output` 可修改保存路径。成功、失败或中断时均关闭本脚本启动的 MAVROS。
+`simulation/autotune_getPID.sh` 使用 `udp://:14540@127.0.0.1:14557`、system ID 1；`real_flight/autotune_getPID.sh` 使用 `/dev/ttyS0:2000000`、system ID 2。连接地址、system ID、AXIS、TIMEOUT 和 OUTPUT 均在脚本参数区设置。
+本脚本只启动 MAVROS 与读取程序，不启动 PX4/Gazebo，也不自动清理；完成后运行同目录 kill.sh。
+若要使用已有 MAVROS，可直接调用 Python 读取程序。
 
-如果已有 `/mavros` 节点，Shell 拒绝重复启动；可在加载 ROS 环境后直接运行 `scripts/autotune_getPID.py` 使用现有 MAVROS，该方式不会关闭现有节点。
+离线分析入口使用参数区指定的 Conda 环境，不在 Shell 中探测或回退解释器。
 
-离线分析脚本优先使用已有 Conda 环境；也支持 `PYTHON=/usr/bin/python3`，无 Conda 时回退到系统 Python（需安装 numpy、PyYAML、pyulog、matplotlib）。
+
+### 分轴启动
+
+在包目录运行 `_scripts/real_flight/autotune_roll.sh`、`_scripts/real_flight/autotune_pitch.sh` 或 `_scripts/real_flight/autotune_yaw.sh`，分别选择 roll、pitch、yaw 配置。每档按 `+−` 两脉冲后回中。不要同时启动多个轴；停止当前会话仍使用 `_scripts/real_flight/kill.sh`。
+
+roll、pitch、yaw 分别使用 `config/brct_autotune_roll.yaml`、`config/brct_autotune_pitch.yaml`、`config/brct_autotune_yaw.yaml`。各轴配置均为完整、独立的配置文件，不会相互包含。pitch 为 25 个 PD 候选；yaw 原始 D=0，保留 D=0，仅 5 个 P 候选，避免重复网格。候选 I=FF=0，K 固定各轴基准。
+
+在各入口参数区修改 `CONFIG`、`OUTPUT` 指定配置和采集目录；Shell 不检查轴匹配或目录存在性，改用 `_scripts/simulation/` 下同名入口可启动仿真。仿真请用对应轴、对应机型的配置，不应直接把实飞参数当作已验证的仿真参数。

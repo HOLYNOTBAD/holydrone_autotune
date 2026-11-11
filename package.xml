@@ -20,6 +20,7 @@
   <depend>boost</depend>
   <!-- 飞控状态、角速度设定值与参数/模式服务消息 -->
   <depend>mavros_msgs</depend>
+  <depend>mavlink</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>

@@ -1,0 +1,38 @@
+# 从 LBC 飞控只读快照生成；候选 I/FF=0，K 固定；退出不自动恢复 baseline。
+experiment_id: real_yaw_pd_01
+axis: yaw
+search_stage: pd
+baseline:
+  MC_YAWRATE_P: 0.2
+  MC_YAWRATE_I: 0.1
+  MC_YAWRATE_D: 0.0
+  MC_YAWRATE_FF: 0.0
+  MC_YAWRATE_K: 1.2
+candidates:
+  - {id: p_0p80_d_1p00, MC_YAWRATE_P: 0.16, MC_YAWRATE_I: 0.0, MC_YAWRATE_D: 0.0, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p90_d_1p00, MC_YAWRATE_P: 0.18, MC_YAWRATE_I: 0.0, MC_YAWRATE_D: 0.0, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_1p00_d_1p00, MC_YAWRATE_P: 0.2, MC_YAWRATE_I: 0.0, MC_YAWRATE_D: 0.0, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_1p10_d_1p00, MC_YAWRATE_P: 0.22, MC_YAWRATE_I: 0.0, MC_YAWRATE_D: 0.0, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_1p20_d_1p00, MC_YAWRATE_P: 0.24, MC_YAWRATE_I: 0.0, MC_YAWRATE_D: 0.0, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+altitude_control:
+  kp: 2.0
+  kd: 2.5
+  ki: 0.4
+  acceleration_limit: 3.0
+  integral_limit: 1.0
+  min_thrust: 0.05
+  max_thrust: 0.8
+recovery:
+  horizontal_speed_tolerance_m_s: 0.3  # 每次脉冲前必须完成水平制动
+  tilt_tolerance_deg: 5.0  # 每次脉冲前必须接近水平
+  angular_speed_tolerance_deg_s: 5.0  # 三轴角速度合量
+  timeout_s: 8.0
+  position_tolerance_m: 0.5
+  horizontal_tolerance_m: 0.75
+  yaw_tolerance_deg: 5.0
+  angular_feedback_timeout_s: 0.1
+excitation:
+  settle_s: 0.3
+  pulse_duration_s: 0.25
+  levels_deg_s: [60, 120]
+  repetitions: 1

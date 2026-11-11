@@ -1,0 +1,26 @@
+{
+  "kind": "autotune",
+  "complete": true,
+  "duration_s": 31.967999999999996,
+  "origin": [
+    -0.08081728219985962,
+    0.04562302306294441,
+    3.487091064453125
+  ],
+  "altitude_min_m": 3.482086181640625,
+  "altitude_max_m": 3.5672607421875,
+  "max_drop_m": 0.0050048828125,
+  "max_tilt_deg": 29.17380507899414,
+  "max_xy_distance_m": 0.7482546527788554,
+  "modes_during_sequence": [
+    "OFFBOARD"
+  ],
+  "hold_verified_s": 3.0,
+  "pulses": 32,
+  "groups": 8,
+  "group_control_verified": true,
+  "recovery_count": 12,
+  "python_tests": 22,
+  "mock_integration": "passed",
+  "scope": "Gazebo holydrone_lite: 2 candidates, 2 amplitudes, 2 groups per amplitude; no real-flight validation"
+}
