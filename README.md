@@ -10,6 +10,14 @@ ROS 1 + MAVROS 的 PX4 角速度环候选参数试验包：**依次写入预设 
 
 核心实现：[在线状态机](src/brct_autotune_fsm.cpp)、[离线分析与指标计算](scripts/autotune_analyze.py)。一阶响应及物理参数辨识属于另一个包 `holydrone_identification`。
 
+## 实机演示
+
+三个轴的调参动作如下。点击动态预览可打开对应的完整 MP4 视频（1280 × 720，含原声）。
+
+| Roll（横滚） | Pitch（俯仰） | Yaw（偏航） |
+| :---: | :---: | :---: |
+| [![Roll 调参动作](media/roll.gif)](media/roll.mp4) | [![Pitch 调参动作](media/pitch.gif)](media/pitch.mp4) | [![Yaw 调参动作](media/yaw.gif)](media/yaw.mp4) |
+
 ## 1. 候选参数与激励
 
 ### 试验哪些参数
