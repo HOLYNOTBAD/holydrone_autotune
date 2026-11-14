@@ -12,3 +12,9 @@ log/
 # 本机实验原始数据、PX4 运行文件和分析产物。
 /data/*
 !/data/.gitkeep
+
+!/data/experiment/
+!/data/dataset/
+*.ulg.part
+/data/experiment/*_px4/
+!/data/README.md

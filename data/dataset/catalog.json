@@ -1,0 +1,47 @@
+[
+  {
+    "session": "pitch_pd_20240618_050448_105534",
+    "axis": "pitch",
+    "status": "完整",
+    "candidates": 25,
+    "finished_trials": 50,
+    "analyzed_pulses": 100,
+    "raw_files": [
+      "../experiment/pitch_pd_20240618_050448_105534/candidates.yaml",
+      "../experiment/pitch_pd_20240618_050448_105534/clock.yaml",
+      "../experiment/pitch_pd_20240618_050448_105534/events.yaml",
+      "../experiment/pitch_pd_20240618_050448_105534/log_189_2026-11-13-22-13-52.ulg",
+      "../experiment/pitch_pd_20240618_050448_105534/timesync.csv"
+    ]
+  },
+  {
+    "session": "roll_pd_20240618_043052_2913",
+    "axis": "roll",
+    "status": "完整",
+    "candidates": 25,
+    "finished_trials": 50,
+    "analyzed_pulses": 100,
+    "raw_files": [
+      "../experiment/roll_pd_20240618_043052_2913/candidates.yaml",
+      "../experiment/roll_pd_20240618_043052_2913/clock.yaml",
+      "../experiment/roll_pd_20240618_043052_2913/events.yaml",
+      "../experiment/roll_pd_20240618_043052_2913/log_190_2026-11-13-22-38-32.ulg",
+      "../experiment/roll_pd_20240618_043052_2913/timesync.csv"
+    ]
+  },
+  {
+    "session": "yaw_pd_20240618_043050_3041",
+    "axis": "yaw",
+    "status": "完整",
+    "candidates": 5,
+    "finished_trials": 10,
+    "analyzed_pulses": 20,
+    "raw_files": [
+      "../experiment/yaw_pd_20240618_043050_3041/candidates.yaml",
+      "../experiment/yaw_pd_20240618_043050_3041/clock.yaml",
+      "../experiment/yaw_pd_20240618_043050_3041/events.yaml",
+      "../experiment/yaw_pd_20240618_043050_3041/log_192_2026-11-13-22-46-22.ulg",
+      "../experiment/yaw_pd_20240618_043050_3041/timesync.csv"
+    ]
+  }
+]
