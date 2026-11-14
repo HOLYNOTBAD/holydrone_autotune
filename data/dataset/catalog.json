@@ -43,5 +43,20 @@
       "../experiment/yaw_pd_20240618_043050_3041/log_192_2026-11-13-22-46-22.ulg",
       "../experiment/yaw_pd_20240618_043050_3041/timesync.csv"
     ]
+  },
+  {
+    "session": "yaw_pd_20261114_113451_6399",
+    "axis": "yaw",
+    "status": "完整",
+    "candidates": 25,
+    "finished_trials": 52,
+    "analyzed_pulses": 0,
+    "raw_files": [
+      "../experiment/yaw_pd_20261114_113451_6399/candidates.yaml",
+      "../experiment/yaw_pd_20261114_113451_6399/clock.yaml",
+      "../experiment/yaw_pd_20261114_113451_6399/events.yaml",
+      "../experiment/yaw_pd_20261114_113451_6399/log_199_2026-11-14-11-51-22.ulg",
+      "../experiment/yaw_pd_20261114_113451_6399/timesync.csv"
+    ]
   }
 ]
