@@ -54,6 +54,16 @@ def experiment(path):
     section += '<p>实验文件　'+'　'.join(link(f) for f in raw)+'</p>'
     if outputs:
         section += '<p>分析结果　'+'　'.join(link(f) for f in outputs)+'</p>'
+    heatmaps = sorted(result.glob('heatmap_*.png'))
+    if heatmaps:
+        section += '<h3>PD 参数热力图</h3><p>横轴 P，纵轴 D；按幅值、方向分别显示。同一实验各图共用指标色标，n 为有效/观测样本数；灰色为缺失或未观测。上升时间短不代表综合性能最佳。</p>'
+        section += '<p>'+' · '.join(link(result/name) for name in ('heatmaps.html','heatmap_metrics.csv','heatmap_source.json') if (result/name).exists())+'</p>'
+        selection=result/'analysis_input'/'selection.json'
+        if selection.exists():
+            audit=json.loads(selection.read_text())
+            section += '<p>按 ULog 覆盖范围选取 %d 个试次，排除 %d 个试次。%s</p>' % (len(audit['included_trial_ids']),len(audit['excluded_trials']),link(selection,'筛选记录'))
+        for f in heatmaps:
+            section += '<details><summary>'+escape(f.stem)+'</summary>'+link(f.with_suffix('.pdf'),'下载 PDF')+'<img loading="lazy" src="'+quote(os.path.relpath(f,OUT))+'" alt="PD 参数热力图"></details>'
     for f in plots:
         section += '<details><summary>'+escape(f.stem)+'</summary><img loading="lazy" src="'+quote(os.path.relpath(f,OUT))+'" alt="实测角速度与目标角速度对比"></details>'
     if rows:

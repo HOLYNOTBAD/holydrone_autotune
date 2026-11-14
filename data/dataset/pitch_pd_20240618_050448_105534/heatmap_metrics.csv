@@ -1,0 +1,301 @@
+axis,amplitude_deg_s,direction,P,D,metric,mean,std,valid_count,pulse_count
+pitch,60,positive,0.096,0.0024,RMSE (rad/s),0.44297218322753906,,1,1
+pitch,60,positive,0.108,0.0024,RMSE (rad/s),0.39569291472435,,1,1
+pitch,60,positive,0.12,0.0024,RMSE (rad/s),0.39674755930900574,,1,1
+pitch,60,positive,0.132,0.0024,RMSE (rad/s),0.39150771498680115,,1,1
+pitch,60,positive,0.144,0.0024,RMSE (rad/s),0.37591052055358887,,1,1
+pitch,60,positive,0.096,0.0027,RMSE (rad/s),0.47270676493644714,,1,1
+pitch,60,positive,0.108,0.0027,RMSE (rad/s),0.39175039529800415,,1,1
+pitch,60,positive,0.12,0.0027,RMSE (rad/s),0.40936267375946045,,1,1
+pitch,60,positive,0.132,0.0027,RMSE (rad/s),0.4441398084163666,,1,1
+pitch,60,positive,0.144,0.0027,RMSE (rad/s),0.3603639602661133,,1,1
+pitch,60,positive,0.096,0.003,RMSE (rad/s),0.4144164025783539,,1,1
+pitch,60,positive,0.108,0.003,RMSE (rad/s),0.41986769437789917,,1,1
+pitch,60,positive,0.12,0.003,RMSE (rad/s),0.421239972114563,,1,1
+pitch,60,positive,0.132,0.003,RMSE (rad/s),0.3807060420513153,,1,1
+pitch,60,positive,0.144,0.003,RMSE (rad/s),0.40899279713630676,,1,1
+pitch,60,positive,0.096,0.0033,RMSE (rad/s),0.42786896228790283,,1,1
+pitch,60,positive,0.108,0.0033,RMSE (rad/s),0.45303183794021606,,1,1
+pitch,60,positive,0.12,0.0033,RMSE (rad/s),0.4643384516239166,,1,1
+pitch,60,positive,0.132,0.0033,RMSE (rad/s),0.4233268201351166,,1,1
+pitch,60,positive,0.144,0.0033,RMSE (rad/s),0.35571610927581787,,1,1
+pitch,60,positive,0.096,0.0036,RMSE (rad/s),0.47453442215919495,,1,1
+pitch,60,positive,0.108,0.0036,RMSE (rad/s),0.4257672429084778,,1,1
+pitch,60,positive,0.12,0.0036,RMSE (rad/s),0.4217149615287781,,1,1
+pitch,60,positive,0.132,0.0036,RMSE (rad/s),0.35244572162628174,,1,1
+pitch,60,positive,0.144,0.0036,RMSE (rad/s),0.3654463589191437,,1,1
+pitch,60,positive,0.096,0.0024,Overshoot (%),12.31135045980981,,1,1
+pitch,60,positive,0.108,0.0024,Overshoot (%),14.028938130392918,,1,1
+pitch,60,positive,0.12,0.0024,Overshoot (%),4.057749866766402,,1,1
+pitch,60,positive,0.132,0.0024,Overshoot (%),5.784398921648392,,1,1
+pitch,60,positive,0.144,0.0024,Overshoot (%),11.148271696994188,,1,1
+pitch,60,positive,0.096,0.0027,Overshoot (%),11.040127035135654,,1,1
+pitch,60,positive,0.108,0.0027,Overshoot (%),14.382491489130011,,1,1
+pitch,60,positive,0.12,0.0027,Overshoot (%),12.231699070438845,,1,1
+pitch,60,positive,0.132,0.0027,Overshoot (%),1.174704250806786,,1,1
+pitch,60,positive,0.144,0.0027,Overshoot (%),10.381378056985158,,1,1
+pitch,60,positive,0.096,0.003,Overshoot (%),10.334431890089936,,1,1
+pitch,60,positive,0.108,0.003,Overshoot (%),5.108642772464564,,1,1
+pitch,60,positive,0.12,0.003,Overshoot (%),6.064254539241047,,1,1
+pitch,60,positive,0.132,0.003,Overshoot (%),5.480102610475708,,1,1
+pitch,60,positive,0.144,0.003,Overshoot (%),11.307961519789087,,1,1
+pitch,60,positive,0.096,0.0033,Overshoot (%),10.058173505460154,,1,1
+pitch,60,positive,0.108,0.0033,Overshoot (%),4.975283328920065,,1,1
+pitch,60,positive,0.12,0.0033,Overshoot (%),9.967388907742068,,1,1
+pitch,60,positive,0.132,0.0033,Overshoot (%),7.632853016728943,,1,1
+pitch,60,positive,0.144,0.0033,Overshoot (%),10.998645019576443,,1,1
+pitch,60,positive,0.096,0.0036,Overshoot (%),10.874324193033596,,1,1
+pitch,60,positive,0.108,0.0036,Overshoot (%),18.441342787058705,,1,1
+pitch,60,positive,0.12,0.0036,Overshoot (%),12.684472310518991,,1,1
+pitch,60,positive,0.132,0.0036,Overshoot (%),16.58794818847851,,1,1
+pitch,60,positive,0.144,0.0036,Overshoot (%),15.876162791422866,,1,1
+pitch,60,positive,0.096,0.0024,Rise time (ms),77.99000000022716,,1,1
+pitch,60,positive,0.108,0.0024,Rise time (ms),62.938000000031025,,1,1
+pitch,60,positive,0.12,0.0024,Rise time (ms),70.43100000009872,,1,1
+pitch,60,positive,0.132,0.0024,Rise time (ms),55.40199999995821,,1,1
+pitch,60,positive,0.144,0.0024,Rise time (ms),52.435999999943306,,1,1
+pitch,60,positive,0.096,0.0027,Rise time (ms),77.8880000002573,,1,1
+pitch,60,positive,0.108,0.0027,Rise time (ms),67.43300000016461,,1,1
+pitch,60,positive,0.12,0.0027,Rise time (ms),62.94000000025335,,1,1
+pitch,60,positive,0.132,0.0027,Rise time (ms),59.935000000223226,,1,1
+pitch,60,positive,0.144,0.0027,Rise time (ms),41.97500000009313,,1,1
+pitch,60,positive,0.096,0.003,Rise time (ms),80.92200000010052,,1,1
+pitch,60,positive,0.108,0.003,Rise time (ms),76.46000000022468,,1,1
+pitch,60,positive,0.12,0.003,Rise time (ms),76.37500000009823,,1,1
+pitch,60,positive,0.132,0.003,Rise time (ms),59.93499999976848,,1,1
+pitch,60,positive,0.144,0.003,Rise time (ms),73.41600000017934,,1,1
+pitch,60,positive,0.096,0.0033,Rise time (ms),80.96199999999953,,1,1
+pitch,60,positive,0.108,0.0033,Rise time (ms),83.9109999997163,,1,1
+pitch,60,positive,0.12,0.0033,Rise time (ms),59.940999999980704,,1,1
+pitch,60,positive,0.132,0.0033,Rise time (ms),80.9159999998883,,1,1
+pitch,60,positive,0.144,0.0033,Rise time (ms),52.43499999960477,,1,1
+pitch,60,positive,0.096,0.0036,Rise time (ms),110.83200000030047,,1,1
+pitch,60,positive,0.108,0.0036,Rise time (ms),73.42599999992672,,1,1
+pitch,60,positive,0.12,0.0036,Rise time (ms),62.97899999981382,,1,1
+pitch,60,positive,0.132,0.0036,Rise time (ms),70.37700000000768,,1,1
+pitch,60,positive,0.144,0.0036,Rise time (ms),58.417000000190455,,1,1
+pitch,60,negative,0.096,0.0024,RMSE (rad/s),0.4334616959095001,,1,1
+pitch,60,negative,0.108,0.0024,RMSE (rad/s),0.42756348848342896,,1,1
+pitch,60,negative,0.12,0.0024,RMSE (rad/s),0.4103755056858063,,1,1
+pitch,60,negative,0.132,0.0024,RMSE (rad/s),0.43712589144706726,,1,1
+pitch,60,negative,0.144,0.0024,RMSE (rad/s),0.3698047995567322,,1,1
+pitch,60,negative,0.096,0.0027,RMSE (rad/s),0.4390031695365906,,1,1
+pitch,60,negative,0.108,0.0027,RMSE (rad/s),0.37463149428367615,,1,1
+pitch,60,negative,0.12,0.0027,RMSE (rad/s),0.4712015986442566,,1,1
+pitch,60,negative,0.132,0.0027,RMSE (rad/s),0.38962963223457336,,1,1
+pitch,60,negative,0.144,0.0027,RMSE (rad/s),0.5027251839637756,,1,1
+pitch,60,negative,0.096,0.003,RMSE (rad/s),0.4165101647377014,,1,1
+pitch,60,negative,0.108,0.003,RMSE (rad/s),0.42241546511650085,,1,1
+pitch,60,negative,0.12,0.003,RMSE (rad/s),0.43013903498649597,,1,1
+pitch,60,negative,0.132,0.003,RMSE (rad/s),0.40290889143943787,,1,1
+pitch,60,negative,0.144,0.003,RMSE (rad/s),0.4544121026992798,,1,1
+pitch,60,negative,0.096,0.0033,RMSE (rad/s),0.4536229968070984,,1,1
+pitch,60,negative,0.108,0.0033,RMSE (rad/s),0.41284123063087463,,1,1
+pitch,60,negative,0.12,0.0033,RMSE (rad/s),0.39412790536880493,,1,1
+pitch,60,negative,0.132,0.0033,RMSE (rad/s),0.4279697835445404,,1,1
+pitch,60,negative,0.144,0.0033,RMSE (rad/s),0.4479857087135315,,1,1
+pitch,60,negative,0.096,0.0036,RMSE (rad/s),0.4591398537158966,,1,1
+pitch,60,negative,0.108,0.0036,RMSE (rad/s),0.4061207175254822,,1,1
+pitch,60,negative,0.12,0.0036,RMSE (rad/s),0.40119171142578125,,1,1
+pitch,60,negative,0.132,0.0036,RMSE (rad/s),0.43829062581062317,,1,1
+pitch,60,negative,0.144,0.0036,RMSE (rad/s),0.43277087807655334,,1,1
+pitch,60,negative,0.096,0.0024,Overshoot (%),9.887111417697184,,1,1
+pitch,60,negative,0.108,0.0024,Overshoot (%),6.398296324249138,,1,1
+pitch,60,negative,0.12,0.0024,Overshoot (%),8.628523842987553,,1,1
+pitch,60,negative,0.132,0.0024,Overshoot (%),14.5652332003737,,1,1
+pitch,60,negative,0.144,0.0024,Overshoot (%),9.782427385018122,,1,1
+pitch,60,negative,0.096,0.0027,Overshoot (%),9.67452177978054,,1,1
+pitch,60,negative,0.108,0.0027,Overshoot (%),7.749148370997026,,1,1
+pitch,60,negative,0.12,0.0027,Overshoot (%),5.405915372440752,,1,1
+pitch,60,negative,0.132,0.0027,Overshoot (%),7.439194386461848,,1,1
+pitch,60,negative,0.144,0.0027,Overshoot (%),4.73188953784666,,1,1
+pitch,60,negative,0.096,0.003,Overshoot (%),9.517655101842578,,1,1
+pitch,60,negative,0.108,0.003,Overshoot (%),2.3172696788151357,,1,1
+pitch,60,negative,0.12,0.003,Overshoot (%),7.848493472474863,,1,1
+pitch,60,negative,0.132,0.003,Overshoot (%),5.878097733412351,,1,1
+pitch,60,negative,0.144,0.003,Overshoot (%),3.6834099656552364,,1,1
+pitch,60,negative,0.096,0.0033,Overshoot (%),1.527176162925294,,1,1
+pitch,60,negative,0.108,0.0033,Overshoot (%),11.078102886920925,,1,1
+pitch,60,negative,0.12,0.0033,Overshoot (%),10.007151992360159,,1,1
+pitch,60,negative,0.132,0.0033,Overshoot (%),5.284759200213342,,1,1
+pitch,60,negative,0.144,0.0033,Overshoot (%),4.040344268031486,,1,1
+pitch,60,negative,0.096,0.0036,Overshoot (%),5.551466703653723,,1,1
+pitch,60,negative,0.108,0.0036,Overshoot (%),6.242442791038064,,1,1
+pitch,60,negative,0.12,0.0036,Overshoot (%),7.692981448722288,,1,1
+pitch,60,negative,0.132,0.0036,Overshoot (%),8.052124178930175,,1,1
+pitch,60,negative,0.144,0.0036,Overshoot (%),6.843681576377053,,1,1
+pitch,60,negative,0.096,0.0024,Rise time (ms),80.90200000015102,,1,1
+pitch,60,negative,0.108,0.0024,Rise time (ms),73.4189999998307,,1,1
+pitch,60,negative,0.12,0.0024,Rise time (ms),64.39199999977063,,1,1
+pitch,60,negative,0.132,0.0024,Rise time (ms),35.9640000001491,,1,1
+pitch,60,negative,0.144,0.0024,Rise time (ms),34.46299999995972,,1,1
+pitch,60,negative,0.096,0.0027,Rise time (ms),65.90899999991962,,1,1
+pitch,60,negative,0.108,0.0027,Rise time (ms),55.45299999994313,,1,1
+pitch,60,negative,0.12,0.0027,Rise time (ms),65.92099999988932,,1,1
+pitch,60,negative,0.132,0.0027,Rise time (ms),46.44800000005489,,1,1
+pitch,60,negative,0.144,0.0027,Rise time (ms),86.89999999978681,,1,1
+pitch,60,negative,0.096,0.003,Rise time (ms),76.42299999997704,,1,1
+pitch,60,negative,0.108,0.003,Rise time (ms),70.42900000033114,,1,1
+pitch,60,negative,0.12,0.003,Rise time (ms),62.87700000029872,,1,1
+pitch,60,negative,0.132,0.003,Rise time (ms),65.93199999997523,,1,1
+pitch,60,negative,0.144,0.003,Rise time (ms),46.50100000026214,,1,1
+pitch,60,negative,0.096,0.0033,Rise time (ms),115.42800000006537,,1,1
+pitch,60,negative,0.108,0.0033,Rise time (ms),76.48799999969924,,1,1
+pitch,60,negative,0.12,0.0033,Rise time (ms),62.94100000013714,,1,1
+pitch,60,negative,0.132,0.0033,Rise time (ms),83.91399999982241,,1,1
+pitch,60,negative,0.144,0.0033,Rise time (ms),52.43900000004942,,1,1
+pitch,60,negative,0.096,0.0036,Rise time (ms),100.40299999991475,,1,1
+pitch,60,negative,0.108,0.0036,Rise time (ms),89.90899999980684,,1,1
+pitch,60,negative,0.12,0.0036,Rise time (ms),73.43900000023496,,1,1
+pitch,60,negative,0.132,0.0036,Rise time (ms),73.42100000005303,,1,1
+pitch,60,negative,0.144,0.0036,Rise time (ms),73.41900000028545,,1,1
+pitch,120,positive,0.096,0.0024,RMSE (rad/s),0.8204328417778015,,1,1
+pitch,120,positive,0.108,0.0024,RMSE (rad/s),0.8423465490341187,,1,1
+pitch,120,positive,0.12,0.0024,RMSE (rad/s),0.919792652130127,,1,1
+pitch,120,positive,0.132,0.0024,RMSE (rad/s),0.7335101962089539,,1,1
+pitch,120,positive,0.144,0.0024,RMSE (rad/s),0.8167354464530945,,1,1
+pitch,120,positive,0.096,0.0027,RMSE (rad/s),0.8345004320144653,,1,1
+pitch,120,positive,0.108,0.0027,RMSE (rad/s),0.769750714302063,,1,1
+pitch,120,positive,0.12,0.0027,RMSE (rad/s),0.8304948806762695,,1,1
+pitch,120,positive,0.132,0.0027,RMSE (rad/s),0.9143828749656677,,1,1
+pitch,120,positive,0.144,0.0027,RMSE (rad/s),0.7307857871055603,,1,1
+pitch,120,positive,0.096,0.003,RMSE (rad/s),0.7830932140350342,,1,1
+pitch,120,positive,0.108,0.003,RMSE (rad/s),0.8934270143508911,,1,1
+pitch,120,positive,0.12,0.003,RMSE (rad/s),0.8141968846321106,,1,1
+pitch,120,positive,0.132,0.003,RMSE (rad/s),1.009263038635254,,1,1
+pitch,120,positive,0.144,0.003,RMSE (rad/s),0.7854356169700623,,1,1
+pitch,120,positive,0.096,0.0033,RMSE (rad/s),0.9263258576393127,,1,1
+pitch,120,positive,0.108,0.0033,RMSE (rad/s),0.8479657769203186,,1,1
+pitch,120,positive,0.12,0.0033,RMSE (rad/s),0.7812150716781616,,1,1
+pitch,120,positive,0.132,0.0033,RMSE (rad/s),0.7495877146720886,,1,1
+pitch,120,positive,0.144,0.0033,RMSE (rad/s),0.9288451671600342,,1,1
+pitch,120,positive,0.096,0.0036,RMSE (rad/s),0.8543951511383057,,1,1
+pitch,120,positive,0.108,0.0036,RMSE (rad/s),0.9900511503219604,,1,1
+pitch,120,positive,0.12,0.0036,RMSE (rad/s),0.7648327946662903,,1,1
+pitch,120,positive,0.132,0.0036,RMSE (rad/s),0.7400963306427002,,1,1
+pitch,120,positive,0.144,0.0036,RMSE (rad/s),0.8707824349403381,,1,1
+pitch,120,positive,0.096,0.0024,Overshoot (%),5.246487373564038,,1,1
+pitch,120,positive,0.108,0.0024,Overshoot (%),5.711794010771156,,1,1
+pitch,120,positive,0.12,0.0024,Overshoot (%),4.353258001207004,,1,1
+pitch,120,positive,0.132,0.0024,Overshoot (%),6.701886849207588,,1,1
+pitch,120,positive,0.144,0.0024,Overshoot (%),7.014607060356622,,1,1
+pitch,120,positive,0.096,0.0027,Overshoot (%),6.105372278044525,,1,1
+pitch,120,positive,0.108,0.0027,Overshoot (%),3.824908717960667,,1,1
+pitch,120,positive,0.12,0.0027,Overshoot (%),5.061059121246808,,1,1
+pitch,120,positive,0.132,0.0027,Overshoot (%),4.980588109175441,,1,1
+pitch,120,positive,0.144,0.0027,Overshoot (%),4.986223015240702,,1,1
+pitch,120,positive,0.096,0.003,Overshoot (%),7.724719061065614,,1,1
+pitch,120,positive,0.108,0.003,Overshoot (%),4.234731451810049,,1,1
+pitch,120,positive,0.12,0.003,Overshoot (%),6.778555722640982,,1,1
+pitch,120,positive,0.132,0.003,Overshoot (%),2.4021120119553108,,1,1
+pitch,120,positive,0.144,0.003,Overshoot (%),4.96196446003854,,1,1
+pitch,120,positive,0.096,0.0033,Overshoot (%),3.274475156397956,,1,1
+pitch,120,positive,0.108,0.0033,Overshoot (%),3.495272404967235,,1,1
+pitch,120,positive,0.12,0.0033,Overshoot (%),5.4997963225825774,,1,1
+pitch,120,positive,0.132,0.0033,Overshoot (%),5.235559070892017,,1,1
+pitch,120,positive,0.144,0.0033,Overshoot (%),6.4986545704538585,,1,1
+pitch,120,positive,0.096,0.0036,Overshoot (%),6.127160581496866,,1,1
+pitch,120,positive,0.108,0.0036,Overshoot (%),1.0998453775034462,,1,1
+pitch,120,positive,0.12,0.0036,Overshoot (%),3.3633473011484387,,1,1
+pitch,120,positive,0.132,0.0036,Overshoot (%),6.41227544475043,,1,1
+pitch,120,positive,0.144,0.0036,Overshoot (%),3.125144453844244,,1,1
+pitch,120,positive,0.096,0.0024,Rise time (ms),73.44299999977011,,1,1
+pitch,120,positive,0.108,0.0024,Rise time (ms),70.4329999998663,,1,1
+pitch,120,positive,0.12,0.0024,Rise time (ms),58.44299999989744,,1,1
+pitch,120,positive,0.132,0.0024,Rise time (ms),52.45899999999892,,1,1
+pitch,120,positive,0.144,0.0024,Rise time (ms),47.938000000158354,,1,1
+pitch,120,positive,0.096,0.0027,Rise time (ms),76.46999999997206,,1,1
+pitch,120,positive,0.108,0.0027,Rise time (ms),73.46899999993184,,1,1
+pitch,120,positive,0.12,0.0027,Rise time (ms),65.93399999974281,,1,1
+pitch,120,positive,0.132,0.0027,Rise time (ms),58.45399999998335,,1,1
+pitch,120,positive,0.144,0.0027,Rise time (ms),52.44200000015553,,1,1
+pitch,120,positive,0.096,0.003,Rise time (ms),83.87099999981729,,1,1
+pitch,120,positive,0.108,0.003,Rise time (ms),76.42699999996694,,1,1
+pitch,120,positive,0.12,0.003,Rise time (ms),70.412000000033,,1,1
+pitch,120,positive,0.132,0.003,Rise time (ms),65.92700000010154,,1,1
+pitch,120,positive,0.144,0.003,Rise time (ms),52.45199999990291,,1,1
+pitch,120,positive,0.096,0.0033,Rise time (ms),101.90099999999802,,1,1
+pitch,120,positive,0.108,0.0033,Rise time (ms),91.36399999988498,,1,1
+pitch,120,positive,0.12,0.0033,Rise time (ms),68.92900000002555,,1,1
+pitch,120,positive,0.132,0.0033,Rise time (ms),62.942000000020926,,1,1
+pitch,120,positive,0.144,0.0033,Rise time (ms),62.87499999962165,,1,1
+pitch,120,positive,0.096,0.0036,Rise time (ms),101.89700000000812,,1,1
+pitch,120,positive,0.108,0.0036,Rise time (ms),100.39000000006126,,1,1
+pitch,120,positive,0.12,0.0036,Rise time (ms),80.91100000001461,,1,1
+pitch,120,positive,0.132,0.0036,Rise time (ms),65.93699999984892,,1,1
+pitch,120,positive,0.144,0.0036,Rise time (ms),62.98500000002605,,1,1
+pitch,120,negative,0.096,0.0024,RMSE (rad/s),0.8773285746574402,,1,1
+pitch,120,negative,0.108,0.0024,RMSE (rad/s),0.7885519862174988,,1,1
+pitch,120,negative,0.12,0.0024,RMSE (rad/s),0.8323156237602234,,1,1
+pitch,120,negative,0.132,0.0024,RMSE (rad/s),0.7664522528648376,,1,1
+pitch,120,negative,0.144,0.0024,RMSE (rad/s),0.8382131457328796,,1,1
+pitch,120,negative,0.096,0.0027,RMSE (rad/s),0.8860273361206055,,1,1
+pitch,120,negative,0.108,0.0027,RMSE (rad/s),0.8153088688850403,,1,1
+pitch,120,negative,0.12,0.0027,RMSE (rad/s),0.8832418322563171,,1,1
+pitch,120,negative,0.132,0.0027,RMSE (rad/s),0.8022700548171997,,1,1
+pitch,120,negative,0.144,0.0027,RMSE (rad/s),0.8255285620689392,,1,1
+pitch,120,negative,0.096,0.003,RMSE (rad/s),0.8662955164909363,,1,1
+pitch,120,negative,0.108,0.003,RMSE (rad/s),0.8575558662414551,,1,1
+pitch,120,negative,0.12,0.003,RMSE (rad/s),0.7876623868942261,,1,1
+pitch,120,negative,0.132,0.003,RMSE (rad/s),0.7841954231262207,,1,1
+pitch,120,negative,0.144,0.003,RMSE (rad/s),0.8290436267852783,,1,1
+pitch,120,negative,0.096,0.0033,RMSE (rad/s),0.846708357334137,,1,1
+pitch,120,negative,0.108,0.0033,RMSE (rad/s),0.8338474035263062,,1,1
+pitch,120,negative,0.12,0.0033,RMSE (rad/s),0.7722485661506653,,1,1
+pitch,120,negative,0.132,0.0033,RMSE (rad/s),0.9272240996360779,,1,1
+pitch,120,negative,0.144,0.0033,RMSE (rad/s),0.7647449970245361,,1,1
+pitch,120,negative,0.096,0.0036,RMSE (rad/s),0.8527767658233643,,1,1
+pitch,120,negative,0.108,0.0036,RMSE (rad/s),0.9214099645614624,,1,1
+pitch,120,negative,0.12,0.0036,RMSE (rad/s),0.83343505859375,,1,1
+pitch,120,negative,0.132,0.0036,RMSE (rad/s),0.7772030830383301,,1,1
+pitch,120,negative,0.144,0.0036,RMSE (rad/s),0.8109626770019531,,1,1
+pitch,120,negative,0.096,0.0024,Overshoot (%),3.203680245650774,,1,1
+pitch,120,negative,0.108,0.0024,Overshoot (%),3.6314208424228225,,1,1
+pitch,120,negative,0.12,0.0024,Overshoot (%),3.1029463390417025,,1,1
+pitch,120,negative,0.132,0.0024,Overshoot (%),4.805120549397814,,1,1
+pitch,120,negative,0.144,0.0024,Overshoot (%),8.06630820510657,,1,1
+pitch,120,negative,0.096,0.0027,Overshoot (%),5.153961077607598,,1,1
+pitch,120,negative,0.108,0.0027,Overshoot (%),2.3572262854597104,,1,1
+pitch,120,negative,0.12,0.0027,Overshoot (%),1.7928705216387901,,1,1
+pitch,120,negative,0.132,0.0027,Overshoot (%),5.693944449740189,,1,1
+pitch,120,negative,0.144,0.0027,Overshoot (%),8.174566703451271,,1,1
+pitch,120,negative,0.096,0.003,Overshoot (%),6.918437996842843,,1,1
+pitch,120,negative,0.108,0.003,Overshoot (%),6.140593286864557,,1,1
+pitch,120,negative,0.12,0.003,Overshoot (%),5.639974571648473,,1,1
+pitch,120,negative,0.132,0.003,Overshoot (%),3.682248833496334,,1,1
+pitch,120,negative,0.144,0.003,Overshoot (%),2.3649216319245916,,1,1
+pitch,120,negative,0.096,0.0033,Overshoot (%),0.9749098339352964,,1,1
+pitch,120,negative,0.108,0.0033,Overshoot (%),3.8020162005925076,,1,1
+pitch,120,negative,0.12,0.0033,Overshoot (%),6.433266892799604,,1,1
+pitch,120,negative,0.132,0.0033,Overshoot (%),1.3337793565763831,,1,1
+pitch,120,negative,0.144,0.0033,Overshoot (%),4.949647352235283,,1,1
+pitch,120,negative,0.096,0.0036,Overshoot (%),3.462954226544458,,1,1
+pitch,120,negative,0.108,0.0036,Overshoot (%),2.707159643936697,,1,1
+pitch,120,negative,0.12,0.0036,Overshoot (%),2.5990605166726284,,1,1
+pitch,120,negative,0.132,0.0036,Overshoot (%),0.8246229048977824,,1,1
+pitch,120,negative,0.144,0.0036,Overshoot (%),0.3086817986436359,,1,1
+pitch,120,negative,0.096,0.0024,Rise time (ms),73.44000000011874,,1,1
+pitch,120,negative,0.108,0.0024,Rise time (ms),62.93600000026345,,1,1
+pitch,120,negative,0.12,0.0024,Rise time (ms),59.929000000011,,1,1
+pitch,120,negative,0.132,0.0024,Rise time (ms),55.44199999985722,,1,1
+pitch,120,negative,0.144,0.0024,Rise time (ms),49.48899999999412,,1,1
+pitch,120,negative,0.096,0.0027,Rise time (ms),77.9250000000502,,1,1
+pitch,120,negative,0.108,0.0027,Rise time (ms),85.37499999965803,,1,1
+pitch,120,negative,0.12,0.0027,Rise time (ms),59.940000000096916,,1,1
+pitch,120,negative,0.132,0.0027,Rise time (ms),41.95400000025984,,1,1
+pitch,120,negative,0.144,0.0027,Rise time (ms),44.949000000087835,,1,1
+pitch,120,negative,0.096,0.003,Rise time (ms),89.93700000019089,,1,1
+pitch,120,negative,0.108,0.003,Rise time (ms),73.43200000013894,,1,1
+pitch,120,negative,0.12,0.003,Rise time (ms),59.936000000107015,,1,1
+pitch,120,negative,0.132,0.003,Rise time (ms),55.432999999993626,,1,1
+pitch,120,negative,0.144,0.003,Rise time (ms),49.4419999999991,,1,1
+pitch,120,negative,0.096,0.0033,Rise time (ms),100.34600000017235,,1,1
+pitch,120,negative,0.108,0.0033,Rise time (ms),79.41899999968882,,1,1
+pitch,120,negative,0.12,0.0033,Rise time (ms),62.929000000167434,,1,1
+pitch,120,negative,0.132,0.0033,Rise time (ms),68.8759999998183,,1,1
+pitch,120,negative,0.144,0.0033,Rise time (ms),41.95400000025984,,1,1
+pitch,120,negative,0.096,0.0036,Rise time (ms),104.89999999981592,,1,1
+pitch,120,negative,0.108,0.0036,Rise time (ms),101.93900000012945,,1,1
+pitch,120,negative,0.12,0.0036,Rise time (ms),86.94900000000416,,1,1
+pitch,120,negative,0.132,0.0036,Rise time (ms),62.933000000157335,,1,1
+pitch,120,negative,0.144,0.0036,Rise time (ms),65.97799999963172,,1,1

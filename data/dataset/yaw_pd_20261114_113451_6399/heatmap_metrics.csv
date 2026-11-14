@@ -1,0 +1,301 @@
+axis,amplitude_deg_s,direction,P,D,metric,mean,std,valid_count,pulse_count
+yaw,60,positive,0.16,0.0,RMSE (rad/s),0.4016404151916504,,1,1
+yaw,60,positive,0.18,0.0,RMSE (rad/s),0.4087711274623871,,1,1
+yaw,60,positive,0.2,0.0,RMSE (rad/s),0.41016823053359985,,1,1
+yaw,60,positive,0.22,0.0,RMSE (rad/s),0.43070465326309204,,1,1
+yaw,60,positive,0.24,0.0,RMSE (rad/s),0.3970067501068115,,1,1
+yaw,60,positive,0.16,0.0002,RMSE (rad/s),0.41121816635131836,,1,1
+yaw,60,positive,0.18,0.0002,RMSE (rad/s),0.3648674786090851,,1,1
+yaw,60,positive,0.2,0.0002,RMSE (rad/s),0.360713928937912,,1,1
+yaw,60,positive,0.22,0.0002,RMSE (rad/s),0.48171520233154297,,1,1
+yaw,60,positive,0.24,0.0002,RMSE (rad/s),0.35819074511528015,,1,1
+yaw,60,positive,0.16,0.0005,RMSE (rad/s),0.3763073682785034,,1,1
+yaw,60,positive,0.18,0.0005,RMSE (rad/s),0.42741239070892334,,1,1
+yaw,60,positive,0.2,0.0005,RMSE (rad/s),0.35130512714385986,,1,1
+yaw,60,positive,0.22,0.0005,RMSE (rad/s),0.34586936235427856,,1,1
+yaw,60,positive,0.24,0.0005,RMSE (rad/s),0.3441331684589386,,1,1
+yaw,60,positive,0.16,0.001,RMSE (rad/s),0.42986759543418884,,1,1
+yaw,60,positive,0.18,0.001,RMSE (rad/s),0.368567556142807,,1,1
+yaw,60,positive,0.2,0.001,RMSE (rad/s),0.3748966157436371,,1,1
+yaw,60,positive,0.22,0.001,RMSE (rad/s),0.3810938000679016,,1,1
+yaw,60,positive,0.24,0.001,RMSE (rad/s),0.41455647349357605,,1,1
+yaw,60,positive,0.16,0.002,RMSE (rad/s),0.37368547916412354,,1,1
+yaw,60,positive,0.18,0.002,RMSE (rad/s),0.3649425804615021,,1,1
+yaw,60,positive,0.2,0.002,RMSE (rad/s),0.3994915187358856,,1,1
+yaw,60,positive,0.22,0.002,RMSE (rad/s),0.4162801206111908,,1,1
+yaw,60,positive,0.24,0.002,RMSE (rad/s),0.36868929862976074,,1,1
+yaw,60,positive,0.16,0.0,Overshoot (%),22.800437817252543,,1,1
+yaw,60,positive,0.18,0.0,Overshoot (%),24.48578699495319,,1,1
+yaw,60,positive,0.2,0.0,Overshoot (%),35.75596340222996,,1,1
+yaw,60,positive,0.22,0.0,Overshoot (%),29.928616757104333,,1,1
+yaw,60,positive,0.24,0.0,Overshoot (%),33.63703381601691,,1,1
+yaw,60,positive,0.16,0.0002,Overshoot (%),22.236765072348625,,1,1
+yaw,60,positive,0.18,0.0002,Overshoot (%),19.16498994597294,,1,1
+yaw,60,positive,0.2,0.0002,Overshoot (%),24.158461562628943,,1,1
+yaw,60,positive,0.22,0.0002,Overshoot (%),34.89201277411505,,1,1
+yaw,60,positive,0.24,0.0002,Overshoot (%),34.026388749653485,,1,1
+yaw,60,positive,0.16,0.0005,Overshoot (%),17.668506882471764,,1,1
+yaw,60,positive,0.18,0.0005,Overshoot (%),21.465864388026517,,1,1
+yaw,60,positive,0.2,0.0005,Overshoot (%),28.184357197812325,,1,1
+yaw,60,positive,0.22,0.0005,Overshoot (%),29.795826495990667,,1,1
+yaw,60,positive,0.24,0.0005,Overshoot (%),26.881851506739512,,1,1
+yaw,60,positive,0.16,0.001,Overshoot (%),14.527485021560766,,1,1
+yaw,60,positive,0.18,0.001,Overshoot (%),14.199032608023469,,1,1
+yaw,60,positive,0.2,0.001,Overshoot (%),17.270659746967134,,1,1
+yaw,60,positive,0.22,0.001,Overshoot (%),19.612378720257393,,1,1
+yaw,60,positive,0.24,0.001,Overshoot (%),19.35508549422301,,1,1
+yaw,60,positive,0.16,0.002,Overshoot (%),3.8278229320065393,,1,1
+yaw,60,positive,0.18,0.002,Overshoot (%),8.015946943626341,,1,1
+yaw,60,positive,0.2,0.002,Overshoot (%),10.10214854006642,,1,1
+yaw,60,positive,0.22,0.002,Overshoot (%),8.418449991415192,,1,1
+yaw,60,positive,0.24,0.002,Overshoot (%),14.703248556202425,,1,1
+yaw,60,positive,0.16,0.0,Rise time (ms),41.989999999941574,,1,1
+yaw,60,positive,0.18,0.0,Rise time (ms),34.46299999995972,,1,1
+yaw,60,positive,0.2,0.0,Rise time (ms),34.45800000008603,,1,1
+yaw,60,positive,0.22,0.0,Rise time (ms),28.46599999998034,,1,1
+yaw,60,positive,0.24,0.0,Rise time (ms),27.05500000001848,,1,1
+yaw,60,positive,0.16,0.0002,Rise time (ms),39.00399999997717,,1,1
+yaw,60,positive,0.18,0.0002,Rise time (ms),38.958999999977095,,1,1
+yaw,60,positive,0.2,0.0002,Rise time (ms),31.418000000030588,,1,1
+yaw,60,positive,0.22,0.0002,Rise time (ms),31.46500000002561,,1,1
+yaw,60,positive,0.24,0.0002,Rise time (ms),35.996999999952095,,1,1
+yaw,60,positive,0.16,0.0005,Rise time (ms),34.463000000187094,,1,1
+yaw,60,positive,0.18,0.0005,Rise time (ms),38.96500000018932,,1,1
+yaw,60,positive,0.2,0.0005,Rise time (ms),34.46699999994962,,1,1
+yaw,60,positive,0.22,0.0005,Rise time (ms),31.521999999995387,,1,1
+yaw,60,positive,0.24,0.0005,Rise time (ms),25.47499999991487,,1,1
+yaw,60,positive,0.16,0.001,Rise time (ms),41.96200000001227,,1,1
+yaw,60,positive,0.18,0.001,Rise time (ms),44.95700000006764,,1,1
+yaw,60,positive,0.2,0.001,Rise time (ms),35.961000000042986,,1,1
+yaw,60,positive,0.22,0.001,Rise time (ms),31.511000000136846,,1,1
+yaw,60,positive,0.24,0.001,Rise time (ms),31.510000000025684,,1,1
+yaw,60,positive,0.16,0.002,Rise time (ms),59.938999999985754,,1,1
+yaw,60,positive,0.18,0.002,Rise time (ms),44.95700000006764,,1,1
+yaw,60,positive,0.2,0.002,Rise time (ms),38.91499999986081,,1,1
+yaw,60,positive,0.22,0.002,Rise time (ms),49.445999999989,,1,1
+yaw,60,positive,0.24,0.002,Rise time (ms),31.46300000003066,,1,1
+yaw,60,negative,0.16,0.0,RMSE (rad/s),0.4171655476093292,,1,1
+yaw,60,negative,0.18,0.0,RMSE (rad/s),0.43531253933906555,,1,1
+yaw,60,negative,0.2,0.0,RMSE (rad/s),0.3803090453147888,,1,1
+yaw,60,negative,0.22,0.0,RMSE (rad/s),0.35185548663139343,,1,1
+yaw,60,negative,0.24,0.0,RMSE (rad/s),0.35153675079345703,,1,1
+yaw,60,negative,0.16,0.0002,RMSE (rad/s),0.3689424991607666,,1,1
+yaw,60,negative,0.18,0.0002,RMSE (rad/s),0.3827340006828308,,1,1
+yaw,60,negative,0.2,0.0002,RMSE (rad/s),0.36545008420944214,,1,1
+yaw,60,negative,0.22,0.0002,RMSE (rad/s),0.41614440083503723,,1,1
+yaw,60,negative,0.24,0.0002,RMSE (rad/s),0.40114861726760864,,1,1
+yaw,60,negative,0.16,0.0005,RMSE (rad/s),0.38675665855407715,,1,1
+yaw,60,negative,0.18,0.0005,RMSE (rad/s),0.3583196997642517,,1,1
+yaw,60,negative,0.2,0.0005,RMSE (rad/s),0.3549763858318329,,1,1
+yaw,60,negative,0.22,0.0005,RMSE (rad/s),0.36011824011802673,,1,1
+yaw,60,negative,0.24,0.0005,RMSE (rad/s),0.38786277174949646,,1,1
+yaw,60,negative,0.16,0.001,RMSE (rad/s),0.3737585246562958,,1,1
+yaw,60,negative,0.18,0.001,RMSE (rad/s),0.4271329939365387,,1,1
+yaw,60,negative,0.2,0.001,RMSE (rad/s),0.41211071610450745,,1,1
+yaw,60,negative,0.22,0.001,RMSE (rad/s),0.4230884909629822,,1,1
+yaw,60,negative,0.24,0.001,RMSE (rad/s),0.39849853515625,,1,1
+yaw,60,negative,0.16,0.002,RMSE (rad/s),0.3746477961540222,,1,1
+yaw,60,negative,0.18,0.002,RMSE (rad/s),0.4517992436885834,,1,1
+yaw,60,negative,0.2,0.002,RMSE (rad/s),0.4403654634952545,,1,1
+yaw,60,negative,0.22,0.002,RMSE (rad/s),0.3781079649925232,,1,1
+yaw,60,negative,0.24,0.002,RMSE (rad/s),0.4135381281375885,,1,1
+yaw,60,negative,0.16,0.0,Overshoot (%),19.643569917467115,,1,1
+yaw,60,negative,0.18,0.0,Overshoot (%),22.543349496893264,,1,1
+yaw,60,negative,0.2,0.0,Overshoot (%),30.217863884805755,,1,1
+yaw,60,negative,0.22,0.0,Overshoot (%),33.42544593917853,,1,1
+yaw,60,negative,0.24,0.0,Overshoot (%),36.03910889427284,,1,1
+yaw,60,negative,0.16,0.0002,Overshoot (%),13.660096531563612,,1,1
+yaw,60,negative,0.18,0.0002,Overshoot (%),23.58749189896173,,1,1
+yaw,60,negative,0.2,0.0002,Overshoot (%),22.919351410702465,,1,1
+yaw,60,negative,0.22,0.0002,Overshoot (%),24.870098972252574,,1,1
+yaw,60,negative,0.24,0.0002,Overshoot (%),26.82448930136002,,1,1
+yaw,60,negative,0.16,0.0005,Overshoot (%),16.610965925981453,,1,1
+yaw,60,negative,0.18,0.0005,Overshoot (%),18.232134092781212,,1,1
+yaw,60,negative,0.2,0.0005,Overshoot (%),24.178952130138985,,1,1
+yaw,60,negative,0.22,0.0005,Overshoot (%),21.25517581942886,,1,1
+yaw,60,negative,0.24,0.0005,Overshoot (%),26.649579540364616,,1,1
+yaw,60,negative,0.16,0.001,Overshoot (%),17.05022677515359,,1,1
+yaw,60,negative,0.18,0.001,Overshoot (%),12.272304545054572,,1,1
+yaw,60,negative,0.2,0.001,Overshoot (%),15.6983502000302,,1,1
+yaw,60,negative,0.22,0.001,Overshoot (%),18.29973019826711,,1,1
+yaw,60,negative,0.24,0.001,Overshoot (%),18.402456243384098,,1,1
+yaw,60,negative,0.16,0.002,Overshoot (%),7.293745508086426,,1,1
+yaw,60,negative,0.18,0.002,Overshoot (%),4.644337896335713,,1,1
+yaw,60,negative,0.2,0.002,Overshoot (%),7.178417763950762,,1,1
+yaw,60,negative,0.22,0.002,Overshoot (%),12.781449613084556,,1,1
+yaw,60,negative,0.24,0.002,Overshoot (%),15.146413996850086,,1,1
+yaw,60,negative,0.16,0.0,Rise time (ms),41.95099999992635,,1,1
+yaw,60,negative,0.18,0.0,Rise time (ms),31.502000000045882,,1,1
+yaw,60,negative,0.2,0.0,Rise time (ms),38.919000000078086,,1,1
+yaw,60,negative,0.22,0.0,Rise time (ms),31.46500000002561,,1,1
+yaw,60,negative,0.24,0.0,Rise time (ms),31.45700000004581,,1,1
+yaw,60,negative,0.16,0.0002,Rise time (ms),41.956000000027416,,1,1
+yaw,60,negative,0.18,0.0002,Rise time (ms),41.956999999911204,,1,1
+yaw,60,negative,0.2,0.0002,Rise time (ms),34.46099999996477,,1,1
+yaw,60,negative,0.22,0.0002,Rise time (ms),31.460000000151922,,1,1
+yaw,60,negative,0.24,0.0002,Rise time (ms),26.979999999866777,,1,1
+yaw,60,negative,0.16,0.0005,Rise time (ms),44.949000000087835,,1,1
+yaw,60,negative,0.18,0.0005,Rise time (ms),37.45900000012625,,1,1
+yaw,60,negative,0.2,0.0005,Rise time (ms),31.508000000030734,,1,1
+yaw,60,negative,0.22,0.0005,Rise time (ms),32.97200000019984,,1,1
+yaw,60,negative,0.24,0.0005,Rise time (ms),31.4659999999094,,1,1
+yaw,60,negative,0.16,0.001,Rise time (ms),38.96300000019437,,1,1
+yaw,60,negative,0.18,0.001,Rise time (ms),41.916000000128406,,1,1
+yaw,60,negative,0.2,0.001,Rise time (ms),36.00699999992685,,1,1
+yaw,60,negative,0.22,0.001,Rise time (ms),34.4950000001063,,1,1
+yaw,60,negative,0.24,0.001,Rise time (ms),28.467000000091502,,1,1
+yaw,60,negative,0.16,0.002,Rise time (ms),52.44699999980185,,1,1
+yaw,60,negative,0.18,0.002,Rise time (ms),38.9709999999468,,1,1
+yaw,60,negative,0.2,0.002,Rise time (ms),41.954000000032465,,1,1
+yaw,60,negative,0.22,0.002,Rise time (ms),34.45499999997992,,1,1
+yaw,60,negative,0.24,0.002,Rise time (ms),35.957999999936874,,1,1
+yaw,120,positive,0.16,0.0,RMSE (rad/s),0.8106959462165833,,1,1
+yaw,120,positive,0.18,0.0,RMSE (rad/s),0.7444502711296082,,1,1
+yaw,120,positive,0.2,0.0,RMSE (rad/s),0.8185715079307556,,1,1
+yaw,120,positive,0.22,0.0,RMSE (rad/s),0.7188580632209778,,1,1
+yaw,120,positive,0.24,0.0,RMSE (rad/s),0.7794233560562134,,1,1
+yaw,120,positive,0.16,0.0002,RMSE (rad/s),0.7711377143859863,,1,1
+yaw,120,positive,0.18,0.0002,RMSE (rad/s),0.8493772745132446,,1,1
+yaw,120,positive,0.2,0.0002,RMSE (rad/s),0.7916403412818909,,1,1
+yaw,120,positive,0.22,0.0002,RMSE (rad/s),0.8046659827232361,,1,1
+yaw,120,positive,0.24,0.0002,RMSE (rad/s),0.7687945365905762,,1,1
+yaw,120,positive,0.16,0.0005,RMSE (rad/s),0.8044886589050293,,1,1
+yaw,120,positive,0.18,0.0005,RMSE (rad/s),0.8337809443473816,,1,1
+yaw,120,positive,0.2,0.0005,RMSE (rad/s),0.7796873450279236,,1,1
+yaw,120,positive,0.22,0.0005,RMSE (rad/s),0.8923543691635132,,1,1
+yaw,120,positive,0.24,0.0005,RMSE (rad/s),0.707825779914856,,1,1
+yaw,120,positive,0.16,0.001,RMSE (rad/s),0.8328835964202881,,1,1
+yaw,120,positive,0.18,0.001,RMSE (rad/s),0.8407403230667114,,1,1
+yaw,120,positive,0.2,0.001,RMSE (rad/s),0.8264312148094177,,1,1
+yaw,120,positive,0.22,0.001,RMSE (rad/s),0.6896359920501709,,1,1
+yaw,120,positive,0.24,0.001,RMSE (rad/s),0.7748399376869202,,1,1
+yaw,120,positive,0.16,0.002,RMSE (rad/s),0.8549532294273376,,1,1
+yaw,120,positive,0.18,0.002,RMSE (rad/s),0.7126160264015198,,1,1
+yaw,120,positive,0.2,0.002,RMSE (rad/s),0.7124801874160767,,1,1
+yaw,120,positive,0.22,0.002,RMSE (rad/s),0.676880419254303,,1,1
+yaw,120,positive,0.24,0.002,RMSE (rad/s),0.664477527141571,,1,1
+yaw,120,positive,0.16,0.0,Overshoot (%),22.16862255172913,,1,1
+yaw,120,positive,0.18,0.0,Overshoot (%),24.619840841063308,,1,1
+yaw,120,positive,0.2,0.0,Overshoot (%),33.29319070954985,,1,1
+yaw,120,positive,0.22,0.0,Overshoot (%),31.891317149701965,,1,1
+yaw,120,positive,0.24,0.0,Overshoot (%),37.16957350380165,,1,1
+yaw,120,positive,0.16,0.0002,Overshoot (%),23.064652301645868,,1,1
+yaw,120,positive,0.18,0.0002,Overshoot (%),20.593353256151854,,1,1
+yaw,120,positive,0.2,0.0002,Overshoot (%),30.523253026245644,,1,1
+yaw,120,positive,0.22,0.0002,Overshoot (%),31.376252584391302,,1,1
+yaw,120,positive,0.24,0.0002,Overshoot (%),34.20511203293549,,1,1
+yaw,120,positive,0.16,0.0005,Overshoot (%),19.174244852298305,,1,1
+yaw,120,positive,0.18,0.0005,Overshoot (%),18.016425335143595,,1,1
+yaw,120,positive,0.2,0.0005,Overshoot (%),20.487599160502825,,1,1
+yaw,120,positive,0.22,0.0005,Overshoot (%),24.594034109649275,,1,1
+yaw,120,positive,0.24,0.0005,Overshoot (%),31.432920387205176,,1,1
+yaw,120,positive,0.16,0.001,Overshoot (%),10.055669102764483,,1,1
+yaw,120,positive,0.18,0.001,Overshoot (%),15.119263994899287,,1,1
+yaw,120,positive,0.2,0.001,Overshoot (%),19.928331887613567,,1,1
+yaw,120,positive,0.22,0.001,Overshoot (%),21.239625755418462,,1,1
+yaw,120,positive,0.24,0.001,Overshoot (%),19.89072031258403,,1,1
+yaw,120,positive,0.16,0.002,Overshoot (%),3.5143969346432704,,1,1
+yaw,120,positive,0.18,0.002,Overshoot (%),3.7143507225953942,,1,1
+yaw,120,positive,0.2,0.002,Overshoot (%),9.221839608889326,,1,1
+yaw,120,positive,0.22,0.002,Overshoot (%),11.193760756866475,,1,1
+yaw,120,positive,0.24,0.002,Overshoot (%),16.696104233985665,,1,1
+yaw,120,positive,0.16,0.0,Rise time (ms),38.959999999860884,,1,1
+yaw,120,positive,0.18,0.0,Rise time (ms),38.96499999996195,,1,1
+yaw,120,positive,0.2,0.0,Rise time (ms),35.961000000042986,,1,1
+yaw,120,positive,0.22,0.0,Rise time (ms),28.43099999995502,,1,1
+yaw,120,positive,0.24,0.0,Rise time (ms),28.516999999965265,,1,1
+yaw,120,positive,0.16,0.0002,Rise time (ms),34.507000000076005,,1,1
+yaw,120,positive,0.18,0.0002,Rise time (ms),37.465000000111104,,1,1
+yaw,120,positive,0.2,0.0002,Rise time (ms),31.46300000003066,,1,1
+yaw,120,positive,0.22,0.0002,Rise time (ms),31.45900000004076,,1,1
+yaw,120,positive,0.24,0.0002,Rise time (ms),25.521999999909895,,1,1
+yaw,120,positive,0.16,0.0005,Rise time (ms),41.97200000021439,,1,1
+yaw,120,positive,0.18,0.0005,Rise time (ms),35.963999999921725,,1,1
+yaw,120,positive,0.2,0.0005,Rise time (ms),31.4699999998993,,1,1
+yaw,120,positive,0.22,0.0005,Rise time (ms),31.510000000025684,,1,1
+yaw,120,positive,0.24,0.0005,Rise time (ms),31.46399999991445,,1,1
+yaw,120,positive,0.16,0.001,Rise time (ms),41.95500000014363,,1,1
+yaw,120,positive,0.18,0.001,Rise time (ms),41.96000000001732,,1,1
+yaw,120,positive,0.2,0.001,Rise time (ms),34.46499999995467,,1,1
+yaw,120,positive,0.22,0.001,Rise time (ms),31.467000000020562,,1,1
+yaw,120,positive,0.24,0.001,Rise time (ms),31.422999999904278,,1,1
+yaw,120,positive,0.16,0.002,Rise time (ms),44.957999999951426,,1,1
+yaw,120,positive,0.18,0.002,Rise time (ms),41.9289999999819,,1,1
+yaw,120,positive,0.2,0.002,Rise time (ms),37.480999999843334,,1,1
+yaw,120,positive,0.22,0.002,Rise time (ms),34.46299999995972,,1,1
+yaw,120,positive,0.24,0.002,Rise time (ms),27.012999999897147,,1,1
+yaw,120,negative,0.16,0.0,RMSE (rad/s),0.9214493632316589,,1,1
+yaw,120,negative,0.18,0.0,RMSE (rad/s),0.7166215181350708,,1,1
+yaw,120,negative,0.2,0.0,RMSE (rad/s),0.7974637150764465,,1,1
+yaw,120,negative,0.22,0.0,RMSE (rad/s),0.6918627023696899,,1,1
+yaw,120,negative,0.24,0.0,RMSE (rad/s),0.7897766828536987,,1,1
+yaw,120,negative,0.16,0.0002,RMSE (rad/s),0.7942947745323181,,1,1
+yaw,120,negative,0.18,0.0002,RMSE (rad/s),0.8336421251296997,,1,1
+yaw,120,negative,0.2,0.0002,RMSE (rad/s),0.737663745880127,,1,1
+yaw,120,negative,0.22,0.0002,RMSE (rad/s),0.9028133749961853,,1,1
+yaw,120,negative,0.24,0.0002,RMSE (rad/s),0.7051020264625549,,1,1
+yaw,120,negative,0.16,0.0005,RMSE (rad/s),0.8201730251312256,,1,1
+yaw,120,negative,0.18,0.0005,RMSE (rad/s),0.7408522367477417,,1,1
+yaw,120,negative,0.2,0.0005,RMSE (rad/s),0.7955226302146912,,1,1
+yaw,120,negative,0.22,0.0005,RMSE (rad/s),0.8230146169662476,,1,1
+yaw,120,negative,0.24,0.0005,RMSE (rad/s),0.7878665924072266,,1,1
+yaw,120,negative,0.16,0.001,RMSE (rad/s),0.8220345377922058,,1,1
+yaw,120,negative,0.18,0.001,RMSE (rad/s),0.7415290474891663,,1,1
+yaw,120,negative,0.2,0.001,RMSE (rad/s),0.8420446515083313,,1,1
+yaw,120,negative,0.22,0.001,RMSE (rad/s),0.797720730304718,,1,1
+yaw,120,negative,0.24,0.001,RMSE (rad/s),0.8430959582328796,,1,1
+yaw,120,negative,0.16,0.002,RMSE (rad/s),0.7736323475837708,,1,1
+yaw,120,negative,0.18,0.002,RMSE (rad/s),0.7156996726989746,,1,1
+yaw,120,negative,0.2,0.002,RMSE (rad/s),0.6956372261047363,,1,1
+yaw,120,negative,0.22,0.002,RMSE (rad/s),0.7618510127067566,,1,1
+yaw,120,negative,0.24,0.002,RMSE (rad/s),0.778120756149292,,1,1
+yaw,120,negative,0.16,0.0,Overshoot (%),19.559683810810743,,1,1
+yaw,120,negative,0.18,0.0,Overshoot (%),21.00772944944791,,1,1
+yaw,120,negative,0.2,0.0,Overshoot (%),27.518709728600115,,1,1
+yaw,120,negative,0.22,0.0,Overshoot (%),26.7157413061248,,1,1
+yaw,120,negative,0.24,0.0,Overshoot (%),32.19664937289877,,1,1
+yaw,120,negative,0.16,0.0002,Overshoot (%),15.164013117611486,,1,1
+yaw,120,negative,0.18,0.0002,Overshoot (%),20.72721358023549,,1,1
+yaw,120,negative,0.2,0.0002,Overshoot (%),21.773382271757725,,1,1
+yaw,120,negative,0.22,0.0002,Overshoot (%),27.830177738401318,,1,1
+yaw,120,negative,0.24,0.0002,Overshoot (%),31.835764944452528,,1,1
+yaw,120,negative,0.16,0.0005,Overshoot (%),11.743511299512184,,1,1
+yaw,120,negative,0.18,0.0005,Overshoot (%),19.486418648313737,,1,1
+yaw,120,negative,0.2,0.0005,Overshoot (%),20.319576506920512,,1,1
+yaw,120,negative,0.22,0.0005,Overshoot (%),23.594401773672057,,1,1
+yaw,120,negative,0.24,0.0005,Overshoot (%),25.331728690956503,,1,1
+yaw,120,negative,0.16,0.001,Overshoot (%),7.530331877287051,,1,1
+yaw,120,negative,0.18,0.001,Overshoot (%),11.457998008557034,,1,1
+yaw,120,negative,0.2,0.001,Overshoot (%),13.364747768203644,,1,1
+yaw,120,negative,0.22,0.001,Overshoot (%),19.53229475223899,,1,1
+yaw,120,negative,0.24,0.001,Overshoot (%),20.366010409627982,,1,1
+yaw,120,negative,0.16,0.002,Overshoot (%),2.019906009650014,,1,1
+yaw,120,negative,0.18,0.002,Overshoot (%),2.135176835542596,,1,1
+yaw,120,negative,0.2,0.002,Overshoot (%),5.723803760061762,,1,1
+yaw,120,negative,0.22,0.002,Overshoot (%),11.81099356851191,,1,1
+yaw,120,negative,0.24,0.002,Overshoot (%),12.865859367577295,,1,1
+yaw,120,negative,0.16,0.0,Rise time (ms),36.00800000003801,,1,1
+yaw,120,negative,0.18,0.0,Rise time (ms),38.954999999987194,,1,1
+yaw,120,negative,0.2,0.0,Rise time (ms),31.510000000025684,,1,1
+yaw,120,negative,0.22,0.0,Rise time (ms),31.46300000003066,,1,1
+yaw,120,negative,0.24,0.0,Rise time (ms),31.460000000151922,,1,1
+yaw,120,negative,0.16,0.0002,Rise time (ms),37.4610000001212,,1,1
+yaw,120,negative,0.18,0.0002,Rise time (ms),38.95800000009331,,1,1
+yaw,120,negative,0.2,0.0002,Rise time (ms),35.959999999931824,,1,1
+yaw,120,negative,0.22,0.0002,Rise time (ms),34.46299999995972,,1,1
+yaw,120,negative,0.24,0.0002,Rise time (ms),31.473000000005413,,1,1
+yaw,120,negative,0.16,0.0005,Rise time (ms),38.956000000098356,,1,1
+yaw,120,negative,0.18,0.0005,Rise time (ms),35.96500000003289,,1,1
+yaw,120,negative,0.2,0.0005,Rise time (ms),34.45899999996982,,1,1
+yaw,120,negative,0.22,0.0005,Rise time (ms),31.46300000003066,,1,1
+yaw,120,negative,0.24,0.0005,Rise time (ms),31.470000000126674,,1,1
+yaw,120,negative,0.16,0.001,Rise time (ms),44.96000000017375,,1,1
+yaw,120,negative,0.18,0.001,Rise time (ms),34.46600000006583,,1,1
+yaw,120,negative,0.2,0.001,Rise time (ms),38.95599999987098,,1,1
+yaw,120,negative,0.22,0.001,Rise time (ms),34.447999999883905,,1,1
+yaw,120,negative,0.24,0.001,Rise time (ms),34.4199999999546,,1,1
+yaw,120,negative,0.16,0.002,Rise time (ms),52.44500000003427,,1,1
+yaw,120,negative,0.18,0.002,Rise time (ms),47.94899999978952,,1,1
+yaw,120,negative,0.2,0.002,Rise time (ms),35.961999999926775,,1,1
+yaw,120,negative,0.22,0.002,Rise time (ms),38.96800000006806,,1,1
+yaw,120,negative,0.24,0.002,Rise time (ms),31.4659999999094,,1,1

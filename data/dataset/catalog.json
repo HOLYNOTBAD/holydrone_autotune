@@ -50,7 +50,7 @@
     "status": "完整",
     "candidates": 25,
     "finished_trials": 52,
-    "analyzed_pulses": 0,
+    "analyzed_pulses": 100,
     "raw_files": [
       "../experiment/yaw_pd_20261114_113451_6399/candidates.yaml",
       "../experiment/yaw_pd_20261114_113451_6399/clock.yaml",

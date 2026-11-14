@@ -1,0 +1,24 @@
+{
+  "session": "/home/holy/holydrone_autotune/src/holydrone_autotune/data/experiment/yaw_pd_20261114_113451_6399",
+  "report": "/home/holy/holydrone_autotune/src/holydrone_autotune/data/dataset/yaw_pd_20261114_113451_6399/report.json",
+  "commit": "90c7909dc03eb605257d74fced87e3055be11f15",
+  "fixed_I_FF_K": [
+    0.1,
+    0.0,
+    1.2
+  ],
+  "excluded_trials": [
+    {
+      "trial_id": 1,
+      "reason": "before ULog coverage"
+    },
+    {
+      "trial_id": 2,
+      "reason": "before ULog coverage"
+    },
+    {
+      "trial_id": 3,
+      "reason": "aborted and before ULog coverage"
+    }
+  ]
+}

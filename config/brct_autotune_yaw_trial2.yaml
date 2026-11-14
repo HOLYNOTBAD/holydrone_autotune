@@ -1,0 +1,63 @@
+# 第二轮 PD 局部搜索：5×5 候选，固定 I/FF/K；按 P 升序，每档 P 下 D 升序。
+# baseline 沿用第一轮历史读回值，供对照/恢复；搜索中心不代表已验证的最优参数。
+# 60/120 deg/s，repetitions=1；25 组参数、50 个试次、100 个正负脉冲。
+# 退出不自动恢复 baseline。
+experiment_id: real_yaw_pd_trial2_20261114
+axis: yaw
+search_stage: manual  # 允许保留原 I/FF；仍自动遍历候选
+baseline:
+  MC_YAWRATE_P: 0.2
+  MC_YAWRATE_I: 0.1
+  MC_YAWRATE_D: 0.0
+  MC_YAWRATE_FF: 0.0
+  MC_YAWRATE_K: 1.2
+candidates:
+  - {id: p_0p180_d_0p001500, MC_YAWRATE_P: 0.180, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001500, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p180_d_0p001625, MC_YAWRATE_P: 0.180, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001625, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p180_d_0p001750, MC_YAWRATE_P: 0.180, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001750, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p180_d_0p001875, MC_YAWRATE_P: 0.180, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001875, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p180_d_0p002000, MC_YAWRATE_P: 0.180, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.002000, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p185_d_0p001500, MC_YAWRATE_P: 0.185, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001500, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p185_d_0p001625, MC_YAWRATE_P: 0.185, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001625, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p185_d_0p001750, MC_YAWRATE_P: 0.185, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001750, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p185_d_0p001875, MC_YAWRATE_P: 0.185, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001875, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p185_d_0p002000, MC_YAWRATE_P: 0.185, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.002000, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p190_d_0p001500, MC_YAWRATE_P: 0.190, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001500, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p190_d_0p001625, MC_YAWRATE_P: 0.190, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001625, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p190_d_0p001750, MC_YAWRATE_P: 0.190, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001750, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p190_d_0p001875, MC_YAWRATE_P: 0.190, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001875, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p190_d_0p002000, MC_YAWRATE_P: 0.190, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.002000, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p195_d_0p001500, MC_YAWRATE_P: 0.195, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001500, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p195_d_0p001625, MC_YAWRATE_P: 0.195, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001625, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p195_d_0p001750, MC_YAWRATE_P: 0.195, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001750, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p195_d_0p001875, MC_YAWRATE_P: 0.195, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001875, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p195_d_0p002000, MC_YAWRATE_P: 0.195, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.002000, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p200_d_0p001500, MC_YAWRATE_P: 0.200, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001500, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p200_d_0p001625, MC_YAWRATE_P: 0.200, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001625, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p200_d_0p001750, MC_YAWRATE_P: 0.200, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001750, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p200_d_0p001875, MC_YAWRATE_P: 0.200, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.001875, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+  - {id: p_0p200_d_0p002000, MC_YAWRATE_P: 0.200, MC_YAWRATE_I: 0.1, MC_YAWRATE_D: 0.002000, MC_YAWRATE_FF: 0.0, MC_YAWRATE_K: 1.2}
+
+altitude_control:
+  kp: 2.0
+  kd: 2.5
+  ki: 0.4
+  acceleration_limit: 3.0
+  integral_limit: 1.0
+  min_thrust: 0.05
+  max_thrust: 0.8
+recovery:
+  horizontal_speed_tolerance_m_s: 0.3  # 每次脉冲前必须完成水平制动
+  tilt_tolerance_deg: 5.0  # 每次脉冲前必须接近水平
+  angular_speed_tolerance_deg_s: 5.0  # 各轴低通后的角速度合量
+  angular_rate_filter_tau_s: 0.05
+  timeout_s: 8.0
+  position_tolerance_m: 0.5
+  horizontal_tolerance_m: 0.75
+  yaw_tolerance_deg: 5.0
+  angular_feedback_timeout_s: 0.1
+excitation:
+  settle_s: 0.3
+  pulse_duration_s: 0.25
+  levels_deg_s: [60, 120]
+  repetitions: 1

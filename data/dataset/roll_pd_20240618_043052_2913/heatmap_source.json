@@ -1,0 +1,11 @@
+{
+  "session": "/home/holy/holydrone_autotune/src/holydrone_autotune/data/experiment/roll_pd_20240618_043052_2913",
+  "report": "/home/holy/holydrone_autotune/src/holydrone_autotune/data/dataset/roll_pd_20240618_043052_2913/report.json",
+  "commit": "90c7909dc03eb605257d74fced87e3055be11f15",
+  "fixed_I_FF_K": [
+    0.1,
+    0.0,
+    0.35
+  ],
+  "excluded_trials": []
+}
