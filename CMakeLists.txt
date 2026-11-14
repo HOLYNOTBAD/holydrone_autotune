@@ -59,7 +59,7 @@ catkin_install_python(PROGRAMS scripts/autotune_analyze.py scripts/autotune_getP
 install(DIRECTORY _scripts/simulation _scripts/real_flight
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/_scripts
   USE_SOURCE_PERMISSIONS)
-install(PROGRAMS scripts/autotune_getPID.py scripts/autotune_analyze.py scripts/autotune_session.py
+install(PROGRAMS scripts/autotune_catalog.py scripts/autotune_getPID.py scripts/autotune_analyze.py scripts/autotune_session.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
 install(FILES environment.yml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 catkin_install_python(PROGRAMS scripts/download_flight_ulog.py

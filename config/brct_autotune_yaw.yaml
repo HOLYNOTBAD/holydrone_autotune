@@ -29,7 +29,8 @@ altitude_control:
 recovery:
   horizontal_speed_tolerance_m_s: 0.3  # 每次脉冲前必须完成水平制动
   tilt_tolerance_deg: 5.0  # 每次脉冲前必须接近水平
-  angular_speed_tolerance_deg_s: 5.0  # 三轴角速度合量
+  angular_speed_tolerance_deg_s: 5.0  # 各轴低通后的角速度合量
+  angular_rate_filter_tau_s: 0.05
   timeout_s: 8.0
   position_tolerance_m: 0.5
   horizontal_tolerance_m: 0.75

@@ -130,18 +130,22 @@ def main():
     if args.ros_minus_px4_s is not None and not np.isfinite(args.ros_minus_px4_s):
         p.error('--ros-minus-px4-s must be finite')
     if args.session is None:
-        sessions = [f.parent for f in (PACKAGE / 'data').glob('*/events.yaml')
+        sessions = [f.parent for base in (PACKAGE/'data', PACKAGE/'data'/'experiment')
+                    for f in base.glob('*/events.yaml')
                     if not f.parent.name.endswith(('_px4', '_result'))]
         if not sessions:
             p.error('no session with events.yaml under ' + str(PACKAGE / 'data'))
         args.session = str(max(sessions, key=lambda s: ((s/'events.yaml').stat().st_mtime_ns, s.name)))
     session = Path(args.session).expanduser()
     if not session.is_dir() and len(session.parts) == 1:
-        session = PACKAGE / 'data' / session
+        nested = PACKAGE / 'data' / 'experiment' / session
+        session = nested if nested.is_dir() else PACKAGE / 'data' / session
     session = session.resolve()
     if not (session / 'events.yaml').is_file():
         p.error('session must contain events.yaml: ' + str(session))
-    destination = (args.output.expanduser() if args.output else session.with_name(session.name+'_result')).resolve()
+    managed = session.parent == (PACKAGE/'data'/'experiment').resolve()
+    default_output = PACKAGE/'data'/'dataset'/session.name if managed else session.with_name(session.name+'_result')
+    destination = (args.output.expanduser() if args.output else default_output).resolve()
     if destination.exists():
         p.error('output already exists; use a new --output directory: ' + str(destination))
     if args.ulog is None:
@@ -167,6 +171,9 @@ def main():
             raise FileExistsError('output was created during analysis: '+str(destination))
         Path(temporary).rename(destination)
     print('Results saved:', destination)
+    if managed:
+        import subprocess
+        subprocess.run([sys.executable, str(PACKAGE/'scripts'/'autotune_catalog.py')], check=True)
 
 
 def resolve_clock(events, sync, override, ulog_info, setpoint_t, setpoint, stream_times):

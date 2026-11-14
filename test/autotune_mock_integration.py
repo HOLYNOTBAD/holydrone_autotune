@@ -113,7 +113,12 @@ class MockFlight(unittest.TestCase):
                         vel = TwistStamped(); vel.header.stamp = rospy.Time.now()
                         vel.twist.linear.x = motion['vx']; vel.twist.linear.y = motion['vy']; vel.twist.linear.z = motion['vz']; vel_pub.publish(vel)
                         imu = Imu(); imu.header.stamp = rospy.Time.now()
-                        imu.angular_velocity.x = motion['rate']; imu_pub.publish(imu)
+                        rate = motion['rate']
+                        if motion.get('alternating_rate', False):
+                            rate *= -1
+                            motion['rate'] = rate
+                        imu.angular_velocity.x = rate
+                        imu_pub.publish(imu)
                     if feedback_thrust['enabled']:
                         target = AttitudeTarget()
                         target.header.stamp = rospy.Time.now()
@@ -343,13 +348,24 @@ class MockFlight(unittest.TestCase):
                 state.mode = 'OFFBOARD'
                 wait_for(lambda: any(e.event_type == 'ORIGIN_CAPTURED' for e in events))
                 motion['x'] = 2.
-                wait_for(lambda: any(e.event_type == 'SAFETY_ABORT' for e in events))
-                self.assertFalse(any(e.event_type in ('PULSE_POSITIVE', 'PULSE_NEGATIVE') for e in events))
-                self.assertTrue(any(e.event_type == 'SAFETY_ABORT' and 'recenter timeout' in e.detail for e in events))
-                time.sleep(.2)
+                wait_for(lambda: sum(e.event_type == 'RECOVERY_WAITING' for e in events) >= 2)
+                self.assertFalse(any(e.event_type in ('SAFETY_ABORT', 'PULSE_POSITIVE', 'PULSE_NEGATIVE') for e in events))
+                motion['x'] = 0.
+                wait_for(lambda: any(e.event_type == 'PULSE_POSITIVE' for e in events))
                 self.assertFalse(mode_requests)
                 self.assertEqual(state.mode, 'OFFBOARD')
                 self.assertTrue(position_commands)
+                close_auto()
+                launch_auto('filtered_handover')
+                motion.update(rate=.11, alternating_rate=True)
+                state.mode = 'OFFBOARD'
+                wait_for(lambda: any(e.event_type == 'RATE_HANDOVER_START' for e in events))
+                motion.update(alternating_rate=False, rate=.20)
+                wait_for(lambda: any(e.event_type == 'RATE_HANDOVER_REJECTED' for e in events))
+                self.assertFalse(any(e.event_type == 'PULSE_POSITIVE' for e in events))
+                motion.update(rate=.11, alternating_rate=True)
+                wait_for(lambda: any(e.event_type == 'PULSE_POSITIVE' for e in events))
+                motion.update(alternating_rate=False, rate=0.)
                 close_auto()
                 launch_auto('direct_parameter_protocol')
                 first=config['candidates'][0]['id']

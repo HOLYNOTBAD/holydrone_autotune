@@ -83,7 +83,7 @@ $\theta$ 表示机体倾角，$g=9.80665$ m/s²。积分项 $I_z$ 对高度误�
 
 回中、参数加载、正常完成和中止后的保持阶段都向 `/mavros/setpoint_raw/local` 发送 XYZ 位置和航向，使用 PX4 内部位置、速度、姿态和角速度控制器。
 脉冲期间只向 `/mavros/setpoint_raw/attitude` 发送角速度与推力。两个接口由同一个定时流程互斥发布，全程保持 OFFBOARD，不调用切模式服务。
-切入角速度控制后先发送 0.65 s 零角速度，再用新的 IMU 反馈累计完整稳定窗口；交接期间任一稳定条件失效，立即退回位置控制，不继续激励。每个脉冲后的回中记录 `RECOVERY_START/FINISHED`，交接失败记录 `RATE_HANDOVER_REJECTED`。交接和重试均计入 `recovery.timeout_s`，不会无限延长等待。
+切入角速度控制后先发送 0.65 s 零角速度，再用新的 IMU 反馈累计完整稳定窗口；交接期间任一稳定条件失效，立即退回位置控制，不继续激励。每个脉冲后的回中记录 `RECOVERY_START/FINISHED`，交接失败记录 `RATE_HANDOVER_REJECTED`。等待期间每隔 `recovery.timeout_s` 检查反馈并记录一次 `RECOVERY_WAITING`；稳定窗口和交接进度跨周期保留。
 回中目标始终是本次进入 OFFBOARD 时的位置；回中仍使用当前候选的角速度 PID。原自写回中增益不再使用。
 
 只有下列条件在连续新鲜 IMU 样本中满足 0.3 s 才开始下一个脉冲（包括第一脉冲）：
@@ -94,11 +94,11 @@ $\theta$ 表示机体倾角，$g=9.80665$ m/s²。积分项 $I_z$ 对高度误�
 | 航向误差 | ≤ 5° |
 | 水平速度合量 | ≤ 0.3 m/s |
 | 机体倾角 | ≤ 5° |
-| 三轴角速度合量 | ≤ 5°/s |
+| 各轴低通后求得的角速度合量（回中与零角速度交接共用，时间常数 0.05 s） | ≤ 5°/s |
 
 上述运动门槛用于激励放行，避免经过原点但仍倾斜或移动时开始下一脉冲；它们不是脉冲期间的自动退出阈值。IMU、位置和速度反馈的新鲜度检查仍保留。未满足回中条件、重复时间戳或采样间断会重置稳定计时。陈旧反馈不用于推进回中，反馈失效时暂停控制指令发布；不因该检查主动请求 POSCTL。PX4 自身的 Offboard 失联行为仍由飞控配置决定。
 
-不设置倾角、高度偏差、空间偏移、垂直速度的自动退出阈值，由操作者手动接管。手动退出 Offboard 后中止试验。回中超过 `recovery.timeout_s`（默认 8 s）或脉冲调度超时会中止激励并保持 OFFBOARD 位置控制；FCU 状态超过 2 s 未更新也会中止试验。
+不设置倾角、高度偏差、空间偏移、垂直速度的自动退出阈值，由操作者手动接管。手动退出 Offboard 后中止试验。等待检查周期（默认 8 s）到期时反馈已过期，或脉冲调度超时，会中止激励；FCU 状态超过 2 s 未更新也会中止试验。
 
 ### 自动序列的边界
 
@@ -179,9 +179,9 @@ JSON 每组报告重复脉冲的中位数、四分位距 IQR（P75−P25）及�
 包内 `_scripts/` 放启动/停止入口，`scripts/` 放 Python 程序，`data/` 放本地实验产物：
 
 ```text
-data/<会话名>/          # 配置、events.yaml、timesync.csv
-data/<会话名>_px4/      # PX4 运行目录与 ULog
-data/<会话名>_result/   # report.json、summary.csv、曲线
+data/experiment/<会话名>/          # 配置、events.yaml、timesync.csv
+data/experiment/<会话名>_px4/      # PX4 运行目录与 ULog
+data/dataset/<会话名>/   # report.json、summary.csv、曲线
 ```
 
 构建与仿真启动（从仓库根目录进入 `deployment`；会话名仅为示例，须选尚不存在的目录）：
@@ -219,7 +219,7 @@ Shell 入口直接启动任务，记录 PID 后返回，不需要 GNOME Terminal
 
 ```bash
 roslaunch holydrone_autotune brct_autotune.launch \
-  output:="$(rospack find holydrone_autotune)/data/roll_p_real_new" \
+  output:="$(rospack find holydrone_autotune)/data/experiment/roll_p_real_new" \
   download_ulog:=true
 ```
 
@@ -245,11 +245,11 @@ conda env create -f deployment/src/holydrone_autotune/environment.yml
 bash deployment/src/holydrone_autotune/_scripts/real_flight/autotune_analyze.sh
 ```
 
-仿真和实飞统一手动将同次飞行的唯一 `.ulg` 复制到 `data/<会话名>/` 根目录，与 `events.yaml`、`timesync.csv` 放在一起。
-先在分析脚本参数区填写实际 `SESSION` 和 `OUTPUT`，再零参数运行；脚本直接调用 Conda 中的分析程序。
-分析程序要求会话目录中有唯一 ULog。需要覆盖日志或时钟偏移时，在脚本参数区的 `EXTRA_ARGS` 填写相应 Python 参数；Python 命令行接口保持不变。
+仿真和实飞统一手动将同次飞行的唯一 `.ulg` 复制到 `data/experiment/<会话名>/` 根目录，与 `events.yaml`、`timesync.csv` 放在一起。
+可传入 `--session <会话名>`；省略时自动选择最新事件记录。
+分析程序要求会话目录中有唯一 ULog。需要覆盖日志或时钟偏移时，在分析脚本命令行传入相应 Python 参数；Python 命令行接口保持不变。
 默认会自动检查 TIMESYNC；仅已通过全部脉冲校验的 PX4_SITL 日志可采用共享时钟回退。只有确认时钟偏移后才传 `--ros-minus-px4-s`，不要照搬其他航次的零偏移。
-Shell 不读取额外环境覆盖或命令行选项，Conda 环境在参数区的 `CONDA_ENV` 设置。
+分析脚本转发命令行选项，Conda 环境在参数区的 `CONDA_ENV` 设置。
 采集会话和分析输出均拒绝覆盖已有目录；分析全部成功后才生成最终结果目录。
 
 本地测试入口为 `catkin_make run_tests_holydrone_autotune`，
@@ -289,3 +289,11 @@ bash deployment/src/holydrone_autotune/_scripts/real_flight/autotune_getPID.sh
 roll、pitch、yaw 分别使用 `config/brct_autotune_roll.yaml`、`config/brct_autotune_pitch.yaml`、`config/brct_autotune_yaw.yaml`。各轴配置均为完整、独立的配置文件，不会相互包含。pitch 为 25 个 PD 候选；yaw 原始 D=0，保留 D=0，仅 5 个 P 候选，避免重复网格。候选 I=FF=0，K 固定各轴基准。
 
 在各入口参数区修改 `CONFIG`、`OUTPUT` 指定配置和采集目录；Shell 不检查轴匹配或目录存在性，改用 `_scripts/simulation/` 下同名入口可启动仿真。仿真请用对应轴、对应机型的配置，不应直接把实飞参数当作已验证的仿真参数。
+
+## 实验归档与离线浏览
+
+采集脚本将会话写入 `data/experiment/<会话名>/`。对应的完整 ULog 放入同一目录。
+从包根目录运行 `python3 scripts/autotune_analyze.py --session <会话名>`，生成
+`data/dataset/<会话名>/` 的曲线、指标表和报告，并更新总览。
+使用浏览器打开 `data/dataset/overview.html`。仅刷新总览可运行
+`python3 scripts/autotune_catalog.py`。复制整个 data 目录可保留全部相对链接。

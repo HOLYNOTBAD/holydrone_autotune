@@ -121,6 +121,8 @@ class Autotune {
   int pulse_index_ = 0;
   double stage_started_ = 0, sent_thrust_ = 0;
   brct::SettlingGate settling_;
+  brct::AngularRateFilter angular_filter_;
+  double filtered_angular_speed_ = 0, angular_filter_tau_ = .05;
   double angular_speed_ = 0, imu_received_ = 0;
   double clock_lead_tolerance_ = 0;
   ros::Time imu_stamp_;
@@ -212,10 +214,11 @@ class Autotune {
     setting(recovery, "horizontal_tolerance_m", horizontal_tolerance_);
     setting(recovery, "position_tolerance_m", position_tolerance_);
     setting(recovery, "yaw_tolerance_deg", yaw_tolerance_deg_);
+    setting(recovery, "angular_rate_filter_tau_s", angular_filter_tau_);
     setting(recovery, "angular_feedback_timeout_s", angular_feedback_timeout_);
     if (altitude_.min_thrust >= altitude_.max_thrust || altitude_.max_thrust > 1 ||
         yaw_tolerance_deg_ >= 180 || tilt_tolerance_deg_ >= 90 ||
-        recovery_timeout_ <= settle_)
+        angular_filter_tau_ > settle_ || recovery_timeout_ <= settle_)
       throw std::runtime_error("inconsistent altitude/recovery limits");
 
     const std::string prefix = axis_ == "roll" ? "MC_ROLLRATE_" :
@@ -317,6 +320,7 @@ class Autotune {
     n["horizontal_error_m"] = std::hypot(origin_.x-position_now_.x, origin_.y-position_now_.y);
     n["speed_m_s"] = std::hypot(std::hypot(velocity_now_.x, velocity_now_.y), velocity_now_.z);
     n["angular_speed_rad_s"] = angular_speed_;
+    n["filtered_angular_speed_rad_s"] = filtered_angular_speed_;
     n["tilt_deg"] = std::acos(cos_tilt_)*180/std::acos(-1.0);
     n["command_thrust"] = sent_thrust_;
     n["control_mode"] = pulse_active_ ? "body_rate_altitude" : (rate_handover_ ? "rate_handover" : (rate_brake_ ? "rate_brake" : "px4_position"));
@@ -444,10 +448,11 @@ class Autotune {
     const double speed = std::hypot(std::hypot(w.x, w.y), w.z);
     if (!std::isfinite(speed) || msg->angular_velocity_covariance[0] == -1 ||
         age < -clock_lead_tolerance_ || age > angular_feedback_timeout_ || msg->header.stamp <= imu_stamp_) {
-      settling_.reset(); return;
+      settling_.reset(); angular_filter_.reset(); return;
     }
     angular_speed_ = speed; imu_stamp_ = msg->header.stamp; imu_received_ = steady();
-    // 每条反馈都检查，避免定时器之间的振荡峰值被遗漏。
+    filtered_angular_speed_ = angular_filter_.observe(imu_stamp_.toSec(), Eigen::Vector3d(w.x, w.y, w.z),
+                                                   angular_filter_tau_, angular_feedback_timeout_);
     settling_.observe(imu_stamp_.toSec(), state_ == "RUNNING" && !pulse_active_ && !rate_brake_ &&
                       (!rate_handover_ || (imu_stamp_-handover_stamp_).toSec() >= .65) && atOrigin(),
                       angular_feedback_timeout_);
@@ -458,7 +463,7 @@ class Autotune {
     return feedbackFresh() &&
       std::hypot(velocity_now_.x, velocity_now_.y) <= horizontal_speed_tolerance_ &&
       cos_tilt_ >= std::cos(tilt_tolerance_deg_*std::acos(-1.0)/180) &&
-      angular_speed_ <= angular_speed_tolerance_deg_s_*std::acos(-1.0)/180 &&
+      filtered_angular_speed_ <= angular_speed_tolerance_deg_s_*std::acos(-1.0)/180 &&
       std::hypot(origin_.x-position_now_.x, origin_.y-position_now_.y) <= horizontal_tolerance_ &&
       std::abs(origin_.z-position_now_.z) <= position_tolerance_ &&
       std::abs(yaw_error) <= yaw_tolerance_deg_*std::acos(-1.0)/180;
@@ -473,7 +478,7 @@ class Autotune {
         << " speed=" << std::hypot(std::hypot(velocity_now_.x, velocity_now_.y), velocity_now_.z)
         << " tilt_deg=" << std::acos(cos_tilt_)*180/std::acos(-1.0)
         << " yaw_deg=" << yaw_error << "/" << yaw_tolerance_deg_
-        << " rate=" << angular_speed_
+        << " rate=" << angular_speed_ << " filtered_rate=" << filtered_angular_speed_
         << " feedback_fresh=" << feedbackFresh() << " stable_window=" << settling_.ready(settle_)
         << " thrust_ready=" << thrustReady();
     return out.str();
@@ -670,7 +675,8 @@ class Autotune {
     res.message += " origin_locked=" + std::string(origin_locked_ ? "true" : "false") +
       " control=" + (pulse_active_ ? "body_rate_altitude" : (rate_handover_ ? "rate_handover" : (rate_brake_ ? "rate_brake" : "px4_position"))) +
       " height_error_m=" + std::to_string(origin_.z-position_now_.z) +
-      " angular_speed_rad_s=" + std::to_string(angular_speed_);
+      " angular_speed_rad_s=" + std::to_string(angular_speed_) +
+      " filtered_angular_speed_rad_s=" + std::to_string(filtered_angular_speed_);
     return true;
   }
 
@@ -718,7 +724,13 @@ class Autotune {
     if (state_ != "RUNNING") return;
     const double now = steady();
     if (!pulse_active_ && now-stage_started_ > recovery_timeout_) {
-      safetyExit("recenter timeout; " + recoveryDiagnostics()); return;
+      if (!feedbackFresh()) {
+        safetyExit("recenter feedback stale; " + recoveryDiagnostics()); return;
+      }
+      stage_started_ = now;
+      const auto detail = recoveryDiagnostics();
+      event("RECOVERY_WAITING", detail);
+      ROS_INFO("Waiting for pulse readiness: %s", detail.c_str());
     }
     if (rate_brake_) return;
     if (rate_handover_) {
