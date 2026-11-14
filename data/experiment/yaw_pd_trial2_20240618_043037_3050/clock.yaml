@@ -1,0 +1,3 @@
+use_sim_time: false
+mavros_timesync_mode: MAVLINK
+max_sample_lead_s: 0

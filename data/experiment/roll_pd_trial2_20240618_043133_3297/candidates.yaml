@@ -1,0 +1,63 @@
+# 第二轮 PD 局部搜索：5×5 候选，固定 I/FF/K；按 P 升序，每档 P 下 D 升序。
+# baseline 沿用第一轮历史读回值，供对照/恢复；搜索中心不代表已验证的最优参数。
+# 60/120 deg/s，repetitions=1；25 组参数、50 个试次、100 个正负脉冲。
+# 退出不自动恢复 baseline。
+experiment_id: real_roll_pd_trial2_20261114
+axis: roll
+search_stage: manual  # 允许保留原 I/FF；仍自动遍历候选
+baseline:
+  MC_ROLLRATE_P: 0.18
+  MC_ROLLRATE_I: 0.1
+  MC_ROLLRATE_D: 0.0036
+  MC_ROLLRATE_FF: 0.0
+  MC_ROLLRATE_K: 0.35
+candidates:
+  - {id: p_0p1980_d_0p00306, MC_ROLLRATE_P: 0.1980, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00306, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p1980_d_0p00315, MC_ROLLRATE_P: 0.1980, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00315, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p1980_d_0p00324, MC_ROLLRATE_P: 0.1980, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00324, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p1980_d_0p00333, MC_ROLLRATE_P: 0.1980, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00333, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p1980_d_0p00342, MC_ROLLRATE_P: 0.1980, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00342, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2025_d_0p00306, MC_ROLLRATE_P: 0.2025, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00306, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2025_d_0p00315, MC_ROLLRATE_P: 0.2025, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00315, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2025_d_0p00324, MC_ROLLRATE_P: 0.2025, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00324, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2025_d_0p00333, MC_ROLLRATE_P: 0.2025, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00333, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2025_d_0p00342, MC_ROLLRATE_P: 0.2025, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00342, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2070_d_0p00306, MC_ROLLRATE_P: 0.2070, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00306, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2070_d_0p00315, MC_ROLLRATE_P: 0.2070, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00315, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2070_d_0p00324, MC_ROLLRATE_P: 0.2070, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00324, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2070_d_0p00333, MC_ROLLRATE_P: 0.2070, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00333, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2070_d_0p00342, MC_ROLLRATE_P: 0.2070, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00342, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2115_d_0p00306, MC_ROLLRATE_P: 0.2115, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00306, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2115_d_0p00315, MC_ROLLRATE_P: 0.2115, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00315, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2115_d_0p00324, MC_ROLLRATE_P: 0.2115, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00324, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2115_d_0p00333, MC_ROLLRATE_P: 0.2115, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00333, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2115_d_0p00342, MC_ROLLRATE_P: 0.2115, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00342, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2160_d_0p00306, MC_ROLLRATE_P: 0.2160, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00306, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2160_d_0p00315, MC_ROLLRATE_P: 0.2160, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00315, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2160_d_0p00324, MC_ROLLRATE_P: 0.2160, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00324, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2160_d_0p00333, MC_ROLLRATE_P: 0.2160, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00333, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+  - {id: p_0p2160_d_0p00342, MC_ROLLRATE_P: 0.2160, MC_ROLLRATE_I: 0.1, MC_ROLLRATE_D: 0.00342, MC_ROLLRATE_FF: 0.0, MC_ROLLRATE_K: 0.35}
+
+altitude_control:  # 脉冲期间：悬停推力 × (1 + 垂直反馈加速度/g) / cos(倾角)
+  kp: 2.0  # 高度误差到加速度，1/s²
+  kd: 2.5  # 向上速度阻尼，1/s
+  ki: 0.4  # 高度误差积分增益，1/s³
+  acceleration_limit: 3.0  # 垂直修正加速度限幅，m/s²
+  integral_limit: 1.0  # 积分项加速度限幅，m/s²
+  min_thrust: 0.05
+  max_thrust: 0.8
+recovery:  # 每个独立脉冲后由 PX4 位置控制回中；不等待精确返回原始 XY
+  horizontal_speed_tolerance_m_s: 0.3  # 每次脉冲前必须完成水平制动
+  tilt_tolerance_deg: 5.0  # 每次脉冲前必须接近水平
+  angular_speed_tolerance_deg_s: 5.0  # 各轴低通后的角速度合量
+  angular_rate_filter_tau_s: 0.05
+  timeout_s: 8.0
+  position_tolerance_m: 0.5  # 高度容差（沿用原参数名）
+  horizontal_tolerance_m: 0.75  # 回中后允许的 XY 偏移；不要求精确回原点
+  yaw_tolerance_deg: 5.0
+  angular_feedback_timeout_s: 0.1  # 按采样/ROS时钟判断IMU新鲜度；另检查墙钟接收间隔
+excitation:  # 每档 low/high：回中稳定→+→位置制动回中→−→位置制动回中；按 repetitions 重复双脉冲组
+  settle_s: 0.3  # 回中条件连续满足此时间后开始下一脉冲，s
+  pulse_duration_s: 0.25  # 每个正负角速度脉冲时长；s；须为有限正数
+  levels_deg_s: [60, 120]  # low/high 两档幅值；deg/s；均 > 0 且 high ≥ low
+  repetitions: 1  # 完整激励计划的重复次数；整数，须 ≥ 1
